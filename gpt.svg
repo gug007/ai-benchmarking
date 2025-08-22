@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img" aria-labelledby="title desc">
+<title id="title">Yerevan Administrative Districts Map</title>
+<desc id="desc">Schematic map of Yerevan showing 12 administrative districts outlined with borders, distinct fills, and readable labels.</desc>
+
+<!-- Accessibility and common styles -->
+<style>
+  .district { stroke: #1f2937; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+  .district:hover { opacity: 0.9; }
+  .label { font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"; font-weight: 700; fill: #111827; font-size: 22px; paint-order: stroke; stroke: #ffffff; stroke-width: 4; stroke-linejoin: round; }
+  .sub { font-weight: 600; font-size: 16px; fill: #111827; paint-order: stroke; stroke: #ffffff; stroke-width: 3; }
+  .border { fill: none; stroke: #111827; stroke-width: 3; vector-effect: non-scaling-stroke; }
+  .legend text { font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial; font-size: 16px; fill: #111827; }
+  .source { font-size: 14px; fill: #374151; }
+</style>
+
+<!-- Background -->
+<rect x="0" y="0" width="1200" height="900" fill="#f8fafc"/>
+
+<!-- Schematic geometry (not geo-accurate, arranged for clarity) -->
+<g id="yerevan-map" transform="translate(60,40)">
+  <!-- Row 1: Davtashen, Ajapnyak, Arabkir, Kanaker-Zeytun -->
+  <g id="davtashen">
+    <path class="district" d="M0,0 h200 v140 h-200 z" fill="#7dd3fc"/>
+    <text class="label" x="100" y="75" text-anchor="middle">Davtashen</text>
+  </g>
+  <g id="ajapnyak" transform="translate(220,0)">
+    <path class="district" d="M0,0 h260 v140 h-260 z" fill="#a7f3d0"/>
+    <text class="label" x="130" y="75" text-anchor="middle">Ajapnyak</text>
+  </g>
+  <g id="arabkir" transform="translate(500,0)">
+    <path class="district" d="M0,0 h220 v140 h-220 z" fill="#fde68a"/>
+    <text class="label" x="110" y="75" text-anchor="middle">Arabkir</text>
+  </g>
+  <g id="kanaker-zeytun" transform="translate(740,0)">
+    <path class="district" d="M0,0 h260 v140 h-260 z" fill="#fca5a5"/>
+    <text class="label" x="130" y="75" text-anchor="middle">Kanaker-Zeytun</text>
+  </g>
+
+  <!-- Row 2: Kentron, Nor Nork, Avan -->
+  <g id="kentron" transform="translate(160,160)">
+    <path class="district" d="M0,0 h260 v160 h-260 z" fill="#c7d2fe"/>
+    <text class="label" x="130" y="90" text-anchor="middle">Kentron</text>
+  </g>
+  <g id="nor-nork" transform="translate(440,160)">
+    <path class="district" d="M0,0 h300 v160 h-300 z" fill="#f9a8d4"/>
+    <text class="label" x="150" y="90" text-anchor="middle">Nor Nork</text>
+  </g>
+  <g id="avan" transform="translate(760,160)">
+    <path class="district" d="M0,0 h240 v160 h-240 z" fill="#86efac"/>
+    <text class="label" x="120" y="90" text-anchor="middle">Avan</text>
+  </g>
+
+  <!-- Row 3: Malatia-Sebastia, Shengavit, Nork-Marash -->
+  <g id="malatia-sebastia" transform="translate(0,340)">
+    <path class="district" d="M0,0 h340 v180 h-340 z" fill="#fcd34d"/>
+    <text class="label" x="170" y="100" text-anchor="middle">Malatia-Sebastia</text>
+  </g>
+  <g id="shengavit" transform="translate(360,340)">
+    <path class="district" d="M0,0 h300 v180 h-300 z" fill="#93c5fd"/>
+    <text class="label" x="150" y="100" text-anchor="middle">Shengavit</text>
+  </g>
+  <g id="nork-marash" transform="translate(680,340)">
+    <path class="district" d="M0,0 h320 v180 h-320 z" fill="#fda4af"/>
+    <text class="label" x="160" y="100" text-anchor="middle">Nork-Marash</text>
+  </g>
+
+  <!-- Row 4: Erebuni, Nubarashen -->
+  <g id="erebuni" transform="translate(120,540)">
+    <path class="district" d="M0,0 h360 v200 h-360 z" fill="#a5b4fc"/>
+    <text class="label" x="180" y="110" text-anchor="middle">Erebuni</text>
+  </g>
+  <g id="nubarashen" transform="translate(500,540)">
+    <path class="district" d="M0,0 h340 v200 h-340 z" fill="#34d399"/>
+    <text class="label" x="170" y="110" text-anchor="middle">Nubarashen</text>
+  </g>
+</g>
+
+<!-- Title and legend -->
+<g transform="translate(60,12)">
+  <text class="label" style="font-size:32px" x="0" y="0">Yerevan Administrative Districts</text>
+  <text class="sub" x="0" y="28">Schematic layout for readability; colors and borders differentiate districts.</text>
+</g>
+
+<g class="legend" transform="translate(920,720)">
+  <rect x="0" y="0" width="220" height="140" rx="10" ry="10" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="14" y="28" font-weight="700">Legend</text>
+  <text x="14" y="58">• Bold labels: district names</text>
+  <text x="14" y="84">• Thick borders separate districts</text>
+  <text x="14" y="110">• Distinct fills aid recognition</text>
+</g>
+
+<!-- Decorative outer border -->
+<rect class="border" x="12" y="12" width="1176" height="876" rx="16" ry="16"/>
+
+</svg>
