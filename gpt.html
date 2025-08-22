@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Counter Strike — GPT Edition</title>
+  <meta name="description" content="A sleek, single-file, top-down Counter-Strike inspired game.">
+  <style>
+    :root {
+      --bg: #0b0e13;
+      --bg-2: #0f141d;
+      --panel: rgba(255,255,255,0.06);
+      --accent: #7dd3fc;
+      --accent-2: #22d3ee;
+      --t: #f59e0b; /* Attackers */
+      --ct: #60a5fa; /* Defenders */
+      --ok: #86efac;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --text: #e5e7eb;
+      --muted: #a1a1aa;
+      --glass: rgba(255,255,255,0.08);
+      --glass-2: rgba(255,255,255,0.04);
+      --shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.06);
+      --radius: 16px;
+    }
+
+    html, body {
+      height: 100%;
+      background: radial-gradient(1200px 800px at 70% -10%, rgba(34,211,238,0.08), transparent 50%),
+                  radial-gradient(1000px 700px at 0% 100%, rgba(125,211,252,0.08), transparent 50%),
+                  linear-gradient(180deg, #0b0e13 0%, #0d1016 100%);
+      color: var(--text);
+      font: 16px/1.4 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .wrap {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* Top HUD */
+    .hud {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: env(safe-area-inset-top) 16px 8px 16px;
+      backdrop-filter: saturate(140%) blur(8px);
+      -webkit-backdrop-filter: saturate(140%) blur(8px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    .hud .team {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+    .team .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.06);
+    }
+    .team.t .dot { background: var(--t); }
+    .team.ct .dot { background: var(--ct); }
+
+    .score {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      background: var(--glass);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .score .val { font-size: 18px; }
+    .score .timer {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+      font-variant-numeric: tabular-nums;
+      color: #fff;
+      min-width: 72px;
+      text-align: center;
+    }
+
+    /* Canvas area */
+    .stage {
+      position: relative;
+      overflow: hidden;
+    }
+    canvas {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      image-rendering: pixelated;
+      border-radius: var(--radius);
+      background: radial-gradient(1200px 800px at 30% 10%, rgba(34,211,238,0.04), transparent 50%),
+                  linear-gradient(180deg, #0b0e13, #0d1016);
+      box-shadow: var(--shadow);
+    }
+
+    /* Bottom status panel */
+    .bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      background: linear-gradient(0deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+      border-top: 1px solid rgba(255,255,255,0.06);
+      z-index: 10;
+    }
+    .bar .stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--glass);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      min-height: 20px;
+      font-weight: 700;
+    }
+    .bar .stat .tag {
+      opacity: 0.7;
+      min-width: 60px;
+    }
+
+    .weapon {
+      display: grid;
+      grid-auto-flow: column;
+      gap: 10px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+
+    /* Floating controls for touch */
+    .controls {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .stick {
+      position: absolute;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
+      pointer-events: all;
+      touch-action: none;
+      display: grid;
+      place-items: center;
+      user-select: none;
+    }
+    .stick.left { left: 16px; }
+    .stick.right { right: 16px; }
+    .stick .nub {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: inset 0 8px 20px rgba(0,0,0,0.4);
+      transform: translate3d(0,0,0);
+    }
+
+    /* Buy menu */
+    .buy {
+      position: absolute;
+      left: 50%;
+      top: 64px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      border-radius: 18px;
+      padding: 16px;
+      width: min(920px, calc(100% - 24px));
+      display: none;
+      z-index: 20;
+    }
+    .buy.show { display: block; }
+    .buy h3 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.85;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .card {
+      background: var(--glass-2);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 6px;
+      box-shadow: var(--shadow);
+    }
+    .card .row { display: flex; justify-content: space-between; align-items: center; }
+    .card .name { font-weight: 800; }
+    .btn-buy {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(125,211,252,0.24), rgba(34,211,238,0.16));
+      color: #03202b;
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+    .btn-buy:disabled { filter: grayscale(1) brightness(0.7); cursor: not-allowed; }
+    .btn-buy:active { transform: translateY(1px) scale(0.98); }
+
+    /* Toasts */
+    .toasts {
+      position: absolute;
+      top: 72px;
+      right: 16px;
+      display: grid;
+      gap: 10px;
+      z-index: 20;
+    }
+    .toast {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    /* Scoreboard */
+    .scoreboard {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      background: radial-gradient(800px 500px at 50% 20%, rgba(255,255,255,0.08), rgba(0,0,0,0.5));
+      backdrop-filter: blur(6px) saturate(140%);
+      -webkit-backdrop-filter: blur(6px) saturate(140%);
+    }
+    .scoreboard.show { display: flex; }
+    .board {
+      width: min(900px, 96%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .board h2 { margin: 0 0 12px 0; }
+    .table { display: grid; grid-template-columns: 1fr 100px 100px 100px; gap: 10px; }
+    .th { opacity: 0.7; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .tr { display: contents; }
+    .td { padding: 8px 10px; background: var(--glass-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; }
+
+    /* Minimap */
+    .minimap {
+      position: absolute;
+      left: 16px;
+      top: 80px;
+      width: 160px;
+      height: 160px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    /* Helper */
+    .kbd { padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.14); font-weight: 800; }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+      .minimap { width: 120px; height: 120px; }
+    }
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      .minimap { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hud">
+      <div class="team t"><div class="dot"></div> Attackers</div>
+      <div class="score">
+        <span class="val" id="scoreT">0</span>
+        <span>-</span>
+        <span class="val" id="scoreCT">0</span>
+        <span class="timer" id="roundTimer">1:55</span>
+      </div>
+      <div class="team ct" style="justify-self:end"><div class="dot"></div> Defenders</div>
+    </div>
+
+    <div class="stage" id="stage">
+      <canvas id="game" width="1280" height="720"></canvas>
+      <canvas id="mapMini" class="minimap" width="160" height="160"></canvas>
+
+      <div class="controls">
+        <div class="stick left" id="stickL" aria-hidden="true"><div class="nub"></div></div>
+        <div class="stick right" id="stickR" aria-hidden="true"><div class="nub"></div></div>
+      </div>
+
+      <div class="buy" id="buy">
+        <h3>Buy Menu — <span id="money">$800</span> &middot; Press <span class="kbd">B</span> to toggle</h3>
+        <div class="grid" id="buyGrid"></div>
+      </div>
+
+      <div class="toasts" id="toasts"></div>
+
+      <div class="scoreboard" id="scoreboard">
+        <div class="board">
+          <h2>Scoreboard</h2>
+          <div class="table" id="boardRows">
+            <div class="tr th"><div class="td">Player</div><div class="td">Kills</div><div class="td">Deaths</div><div class="td">Money</div></div>
+          </div>
+          <p style="opacity:.7;margin-top:12px">Press <span class="kbd">Tab</span> to close</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <div class="stat">
+        <span class="tag">Health</span>
+        <div id="hpBar" style="flex:1;height:10px;border-radius:8px;background:linear-gradient(90deg,var(--ok),rgba(255,255,255,0.1)); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);"></div>
+      </div>
+      <div class="weapon"><span id="weaponName">GLOCK-18</span><span style="opacity:.6">&middot;</span><span id="ammo">20/100</span></div>
+      <div class="stat" style="justify-self:end">
+        <span class="tag">Status</span>
+        <span id="status" style="font-weight:800">Buy Phase</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  ;(() => {
+    // Utility helpers
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n))
+    const lerp = (a, b, t) => a + (b - a) * t
+    const dist = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1)
+    const angleBetween = (x1, y1, x2, y2) => Math.atan2(y2 - y1, x2 - x1)
+    const rand = (a = 1, b = 0) => Math.random() * (b - a) + a
+    const choice = arr => arr[(Math.random() * arr.length) | 0]
+    const now = () => performance.now()
+
+    const WIDTH = 1280
+    const HEIGHT = 720
+    const TILE = 48
+    const WORLD_SCALE = 1
+
+    const TWO_PI = Math.PI * 2
+
+    // Teams and round states
+    const TEAM = { T: 'T', CT: 'CT' }
+    const ROUND = { FREEZE: 'FREEZE', LIVE: 'LIVE', PLANTED: 'PLANTED', POST: 'POST' }
+
+    const COLORS = {
+      floor: '#0c111b',
+      floor2: '#0a0f18',
+      wall: '#1f2937',
+      wallEdge: '#4b5563',
+      siteA: '#0ea5e9',
+      siteB: '#f59e0b',
+      t: '#f59e0b',
+      ct: '#60a5fa',
+      bomb: '#ef4444',
+      bullet: '#e5e7eb',
+    }
+
+    // Weapons
+    const WEAPONS = {
+      GLOCK: { name: 'GLOCK-18', dmg: 18, rpm: 400, spread: 0.045, range: 900, price: 0, clip: 20, reserve: 100, reload: 1.6, autofire: true, team: TEAM.T },
+      USP:   { name: 'USP-S',    dmg: 20, rpm: 360, spread: 0.04,  range: 900, price: 0, clip: 12, reserve: 72,  reload: 1.7, autofire: true, team: TEAM.CT },
+      AK:    { name: 'AK-47',    dmg: 36, rpm: 600, spread: 0.05,  range: 1100,price: 2700, clip: 30, reserve: 90,  reload: 2.3, autofire: true },
+      M4:    { name: 'M4A1-S',   dmg: 33, rpm: 600, spread: 0.045, range: 1100,price: 2900, clip: 25, reserve: 75,  reload: 2.2, autofire: true },
+      AWP:   { name: 'AWP',      dmg: 115,rpm: 45,  spread: 0.005, range: 2000,price: 4750, clip: 5,  reserve: 20,  reload: 2.8, autofire: false },
+      SMG:   { name: 'MP9',      dmg: 20, rpm: 800, spread: 0.065, range: 800, price: 1250, clip: 30, reserve: 120, reload: 2.1, autofire: true },
+    }
+
+    const BUY_ITEMS = [
+      { key: 'AK', allow: TEAM.T },
+      { key: 'M4', allow: TEAM.CT },
+      { key: 'SMG' },
+      { key: 'AWP' },
+    ]
+
+    // Economy values
+    const MONEY_START = 800
+    const MONEY_WIN_ELIM = 3250
+    const MONEY_LOSS = 1400
+    const MONEY_PLANT = 300
+    const MONEY_DEFUSE = 300
+    const MONEY_KILL = 300
+
+    // Map: 0 floor, 1 wall, 'A' site, 'B' site
+    const MAP_W = 26
+    const MAP_H = 16
+    const MAP = [
+      '11111111111111111111111111',
+      '1A00000100000000000100000B1',
+      '100001110000011100000111001',
+      '100000010000010000000001001',
+      '100000010000010000000001001',
+      '111100011111110001111100001',
+      '100000000000000000000000001',
+      '100001111001111100111110001',
+      '100000001000000010000000001',
+      '111110001111111110001111111',
+      '100000000000100000000000001',
+      '100011110000100001111000001',
+      '100010000000100000001000001',
+      '100010000000000000001000001',
+      '1T0000000000000000000000C01',
+      '11111111111111111111111111',
+    ].map(r => r.split(''))
+
+    // Spawns labeled above: row with 'T' and 'C'
+    const SPAWNS_T = []
+    const SPAWNS_CT = []
+    for (let y = 0; y < MAP_H; y++) {
+      for (let x = 0; x < MAP_W; x++) {
+        if (MAP[y][x] === 'T') SPAWNS_T.push({ x, y })
+        if (MAP[y][x] === 'C') SPAWNS_CT.push({ x, y })
+      }
+    }
+
+    const A_SITES = []
+    const B_SITES = []
+    for (let y = 0; y < MAP_H; y++) {
+      for (let x = 0; x < MAP_W; x++) {
+        if (MAP[y][x] === 'A') A_SITES.push({ x, y })
+        if (MAP[y][x] === 'B') B_SITES.push({ x, y })
+      }
+    }
+
+    // Canvas setup
+    const canvas = document.getElementById('game')
+    const ctx = canvas.getContext('2d')
+    const mini = document.getElementById('mapMini')
+    const mctx = mini.getContext('2d')
+    const dpi = () => window.devicePixelRatio || 1
+
+    const resize = () => {
+      const parent = document.getElementById('stage')
+      const w = parent.clientWidth
+      const h = parent.clientHeight
+      const aspect = WIDTH / HEIGHT
+      let cw = w
+      let ch = w / aspect
+      if (ch > h) { ch = h; cw = h * aspect }
+      canvas.style.width = cw + 'px'
+      canvas.style.height = ch + 'px'
+    }
+    window.addEventListener('resize', resize)
+
+    // Input
+    const keys = new Set()
+    window.addEventListener('keydown', e => {
+      keys.add(e.key.toLowerCase())
+      if (e.key === 'Tab') { e.preventDefault(); toggleScore(true) }
+    })
+    window.addEventListener('keyup', e => {
+      keys.delete(e.key.toLowerCase())
+      if (e.key === 'Tab') { e.preventDefault(); toggleScore(false) }
+      if (e.key.toLowerCase() === 'b') toggleBuy()
+    })
+
+    const mouse = { x: 0, y: 0, down: false }
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect()
+      mouse.x = (e.clientX - rect.left) * (canvas.width / rect.width)
+      mouse.y = (e.clientY - rect.top) * (canvas.height / rect.height)
+    })
+    window.addEventListener('mousedown', () => mouse.down = true)
+    window.addEventListener('mouseup', () => mouse.down = false)
+
+    // Touch sticks
+    const stickL = document.getElementById('stickL')
+    const stickR = document.getElementById('stickR')
+    const makeStick = el => {
+      const nub = el.querySelector('.nub')
+      let active = false
+      let start = { x: 0, y: 0 }
+      let vec = { x: 0, y: 0 }
+
+      const on = (type, fn) => el.addEventListener(type, fn, { passive: false })
+      const clampStick = (dx, dy) => {
+        const r = 56
+        const len = Math.hypot(dx, dy)
+        if (len === 0) return { x: 0, y: 0 }
+        const k = Math.min(1, r / len)
+        return { x: dx * k, y: dy * k }
+      }
+
+      on('pointerdown', e => {
+        active = true
+        el.setPointerCapture(e.pointerId)
+        start = { x: e.clientX, y: e.clientY }
+        e.preventDefault()
+      })
+      on('pointermove', e => {
+        if (!active) return
+        const dx = e.clientX - start.x
+        const dy = e.clientY - start.y
+        const v = clampStick(dx, dy)
+        nub.style.transform = `translate(${v.x}px, ${v.y}px)`
+        vec = { x: v.x / 56, y: v.y / 56 }
+        e.preventDefault()
+      })
+      const reset = () => { active = false; vec = { x: 0, y: 0 }; nub.style.transform = 'translate(0,0)' }
+      on('pointerup', reset)
+      on('pointercancel', reset)
+      return { el, get: () => vec }
+    }
+    const leftStick = makeStick(stickL)
+    const rightStick = makeStick(stickR)
+
+    // Audio (WebAudio synth)
+    const audio = new (window.AudioContext || window.webkitAudioContext)()
+    const sfx = {
+      click: () => beep(660, 0.04, 0.002),
+      buy: () => beep(520, 0.06, 0.002),
+      error: () => noise(0.08, 500),
+      shot: () => click(0.02, 220),
+      awp: () => click(0.06, 120),
+      hit: () => beep(220, 0.02, 0.003),
+      step: () => click(0.01, 500),
+      plant: () => seq([ [440,0.07],[660,0.09] ]),
+      defuse: () => seq([ [660,0.05],[880,0.07] ]),
+      beep: () => beep(1200, 0.03, 0.003),
+      explode: () => noise(0.4, 60),
+      win: () => seq([ [660,0.12],[880,0.18],[990,0.22] ]),
+      lose: () => seq([ [300,0.12],[220,0.18] ]),
+    }
+    function masterGain() {
+      const g = audio.createGain()
+      g.gain.value = 0.3
+      g.connect(audio.destination)
+      return g
+    }
+    const master = masterGain()
+
+    function beep(freq, dur, ramp) {
+      const o = audio.createOscillator()
+      const g = audio.createGain()
+      o.frequency.value = freq
+      o.type = 'sine'
+      g.gain.value = 0.0001
+      o.connect(g); g.connect(master)
+      o.start()
+      g.gain.linearRampToValueAtTime(0.3, audio.currentTime + (ramp || 0.005))
+      g.gain.exponentialRampToValueAtTime(0.00001, audio.currentTime + dur)
+      o.stop(audio.currentTime + dur)
+    }
+    function click(dur, freq) {
+      const b = audio.createBuffer(1, audio.sampleRate * dur, audio.sampleRate)
+      const d = b.getChannelData(0)
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audio.sampleRate * dur))
+      const s = audio.createBufferSource(); s.buffer = b
+      const g = audio.createGain(); g.gain.value = 0.6
+      const f = audio.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq
+      s.connect(f); f.connect(g); g.connect(master)
+      s.start()
+    }
+    function noise(dur, freq) {
+      const b = audio.createBuffer(1, audio.sampleRate * dur, audio.sampleRate)
+      const d = b.getChannelData(0)
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audio.sampleRate * dur * 1.2))
+      const s = audio.createBufferSource(); s.buffer = b
+      const g = audio.createGain(); g.gain.value = 0.6
+      const f = audio.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq
+      s.connect(f); f.connect(g); g.connect(master)
+      s.start()
+    }
+    function seq(parts) { parts.forEach(([f,d],i) => setTimeout(() => beep(f,d,0.002), i ? 100 : 0)) }
+
+    // World state
+    const state = {
+      round: ROUND.FREEZE,
+      timeLeft: 115,
+      freezeTime: 12,
+      postTime: 7,
+      bombTimer: 40,
+      plantedAt: null,
+      plantedTime: 0,
+      bombPos: null,
+      tScore: 0,
+      ctScore: 0,
+      entities: [],
+      bullets: [],
+      particles: [],
+    }
+
+    // Pathfinding grid
+    const isWall = (gx, gy) => gx < 0 || gy < 0 || gx >= MAP_W || gy >= MAP_H || MAP[gy][gx] === '1'
+
+    function bfs(start, goal) {
+      const q = [start]
+      const seen = new Set([start.x + ',' + start.y])
+      const parent = new Map()
+      const dirs = [ [1,0],[-1,0],[0,1],[0,-1] ]
+      while (q.length) {
+        const cur = q.shift()
+        if (cur.x === goal.x && cur.y === goal.y) {
+          const path = [cur]
+          let key = cur.x + ',' + cur.y
+          while (parent.has(key)) {
+            const p = parent.get(key)
+            path.push(p)
+            key = p.x + ',' + p.y
+          }
+          path.reverse()
+          return path
+        }
+        for (const [dx, dy] of dirs) {
+          const nx = cur.x + dx; const ny = cur.y + dy
+          const k = nx + ',' + ny
+          if (!seen.has(k) && !isWall(nx, ny)) {
+            seen.add(k)
+            parent.set(k, cur)
+            q.push({ x: nx, y: ny })
+          }
+        }
+      }
+      return null
+    }
+
+    // Entity system
+    let nextId = 1
+    class Entity {
+      constructor(x, y, team, isBot = false) {
+        this.id = nextId++
+        this.x = x
+        this.y = y
+        this.r = 14
+        this.team = team
+        this.hp = 100
+        this.isBot = isBot
+        this.dir = 0
+        this.speed = 150
+        this.kills = 0
+        this.deaths = 0
+        this.money = MONEY_START
+        this.hasBomb = false
+        this.isDefusing = false
+        this.defuseStart = 0
+        this.isPlanting = false
+        this.plantStart = 0
+        this.weapon = null
+        this.reloadEnd = 0
+        this.lastShot = 0
+        this.ammo = { clip: 0, reserve: 0 }
+        this.name = isBot ? (team === TEAM.T ? 'T-Bot' : 'CT-Bot') : 'You'
+        this.spawn()
+      }
+      spawn() {
+        const s = this.team === TEAM.T ? choice(SPAWNS_T) : choice(SPAWNS_CT)
+        this.x = (s.x + 0.5) * TILE
+        this.y = (s.y + 0.5) * TILE
+        this.hp = 100
+        this.isDefusing = false
+        this.isPlanting = false
+        this.reloadEnd = 0
+        if (!this.weapon) this.equipDefault()
+        if (this.team === TEAM.T) this.hasBomb = false
+      }
+      equipDefault() {
+        if (this.team === TEAM.T) this.giveWeapon(WEAPONS.GLOCK)
+        else this.giveWeapon(WEAPONS.USP)
+      }
+      giveWeapon(spec) {
+        this.weapon = { ...spec }
+        this.ammo.clip = spec.clip
+        this.ammo.reserve = spec.reserve
+        updateHUD()
+      }
+      tryShoot(targetX, targetY) {
+        if (!this.weapon) return
+        if (now() < this.reloadEnd) return
+        const msPerShot = 60000 / this.weapon.rpm
+        if (now() - this.lastShot < msPerShot) return
+        if (this.ammo.clip <= 0) { reloadWeapon(this); return }
+        this.lastShot = now()
+        this.ammo.clip--
+        const base = angleBetween(this.x, this.y, targetX, targetY)
+        const spread = this.weapon.spread
+        const ang = base + rand(-spread, spread)
+        const range = this.weapon.range
+        const hit = raycastShot(this, ang, range)
+        playShot(this)
+        if (hit && hit.entity) {
+          const victim = hit.entity
+          const dmg = this.weapon.dmg
+          victim.hp -= dmg
+          sfx.hit()
+          spawnHit(hit.x, hit.y)
+          if (victim.hp <= 0) {
+            victim.deaths++
+            this.kills++
+            this.money += MONEY_KILL
+            respawn(victim)
+          }
+        }
+      }
+      update(dt, input) {
+        if (this.hp <= 0) return
+        let moveX = 0, moveY = 0
+        if (input) { moveX = input.mx; moveY = input.my }
+        const sp = this.speed
+        const nx = this.x + moveX * sp * dt
+        const ny = this.y + moveY * sp * dt
+        const [cx, cy] = collide(this.x, this.y, nx, ny, this.r)
+        this.x = cx
+        this.y = cy
+        if (input && (input.ax !== 0 || input.ay !== 0)) this.dir = Math.atan2(input.ay, input.ax)
+      }
+    }
+
+    function respawn(ent) {
+      ent.hp = 100
+      ent.spawn()
+    }
+
+    // Raycast shot, returns hit { x,y, entity|null }
+    function raycastShot(shooter, ang, range) {
+      const step = 8
+      const dx = Math.cos(ang) * step
+      const dy = Math.sin(ang) * step
+      let x = shooter.x
+      let y = shooter.y
+      let best = null
+      for (let t = 0; t < range; t += step) {
+        x += dx; y += dy
+        const gx = (x / TILE) | 0
+        const gy = (y / TILE) | 0
+        if (isWall(gx, gy)) return best
+        // entity check
+        for (const e of state.entities) {
+          if (e === shooter || e.hp <= 0) continue
+          if (dist(x, y, e.x, e.y) < e.r + 4) {
+            best = { x, y, entity: e }
+            return best
+          }
+        }
+      }
+      return best
+    }
+
+    function reloadWeapon(p) {
+      if (!p.weapon) return
+      if (p.ammo.clip >= p.weapon.clip) return
+      if (p.ammo.reserve <= 0) return
+      p.reloadEnd = now() + p.weapon.reload * 1000
+      setTimeout(() => {
+        const need = p.weapon.clip - p.ammo.clip
+        const give = Math.min(need, p.ammo.reserve)
+        p.ammo.clip += give
+        p.ammo.reserve -= give
+        updateHUD()
+      }, p.weapon.reload * 1000)
+    }
+
+    function collide(x0, y0, x1, y1, r) {
+      const tryPoint = (tx, ty) => !isWall((tx / TILE) | 0, (ty / TILE) | 0)
+      let rx = x1, ry = y1
+      if (!tryPoint(rx, y0)) rx = x0
+      if (!tryPoint(x0, ry)) ry = y0
+      if (!tryPoint(rx, ry)) { rx = x0; ry = y0 }
+      return [rx, ry]
+    }
+
+    // AI
+    class Bot extends Entity {
+      constructor(x, y, team) {
+        super(x, y, team, true)
+        this.goal = null
+        this.path = []
+        this.pathIdx = 0
+        this.lastPlan = 0
+      }
+      plan() {
+        // Plan towards bomb site or enemies
+        let target = null
+        if (state.round === ROUND.FREEZE) return
+        if (this.team === TEAM.T) {
+          if (state.round === ROUND.PLANTED) target = state.bombPos
+          else target = choice(this.closestSite())
+        } else {
+          if (state.round === ROUND.PLANTED) target = state.bombPos
+          else target = this.closestCenter()
+        }
+        if (!target) return
+        const start = { x: (this.x / TILE) | 0, y: (this.y / TILE) | 0 }
+        const goal = { x: (target.x / TILE) | 0, y: (target.y / TILE) | 0 }
+        const p = bfs(start, goal)
+        if (p && p.length) {
+          this.path = p
+          this.pathIdx = 0
+        }
+      }
+      closestSite() {
+        // convert site cells to midpoints
+        const list = (Math.random() < 0.5 ? A_SITES : B_SITES).map(s => ({ x: (s.x + 0.5) * TILE, y: (s.y + 0.5) * TILE }))
+        return list
+      }
+      closestCenter() {
+        return [{ x: (MAP_W/2+0.5)*TILE, y: (MAP_H/2+0.5)*TILE }]
+      }
+      senseEnemy() {
+        let best = null
+        let bestD = 99999
+        for (const e of state.entities) {
+          if (e.team === this.team || e.hp <= 0) continue
+          const d = dist(this.x, this.y, e.x, e.y)
+          if (d < bestD && this.hasLine(this.x, this.y, e.x, e.y)) { best = e; bestD = d }
+        }
+        return best
+      }
+      hasLine(x1, y1, x2, y2) {
+        const steps = Math.ceil(dist(x1, y1, x2, y2) / 8)
+        for (let i = 0; i < steps; i++) {
+          const x = lerp(x1, x2, i / steps)
+          const y = lerp(y1, y2, i / steps)
+          if (isWall((x / TILE) | 0, (y / TILE) | 0)) return false
+        }
+        return true
+      }
+      update(dt) {
+        if (this.hp <= 0) return
+        const enemy = this.senseEnemy()
+        if (enemy) {
+          this.dir = angleBetween(this.x, this.y, enemy.x, enemy.y)
+          if (now() - this.lastShot > 100) this.tryShoot(enemy.x, enemy.y)
+        }
+        if (now() - this.lastPlan > 600) { this.lastPlan = now(); this.plan() }
+        if (this.path.length) {
+          const node = this.path[Math.min(this.pathIdx + 1, this.path.length - 1)]
+          const tx = (node.x + 0.5) * TILE
+          const ty = (node.y + 0.5) * TILE
+          const a = angleBetween(this.x, this.y, tx, ty)
+          const mx = Math.cos(a)
+          const my = Math.sin(a)
+          super.update(dt, { mx, my, ax: mx, ay: my })
+          if (dist(this.x, this.y, tx, ty) < 8) this.pathIdx++
+        }
+        // Plant / defuse logic
+        if (this.team === TEAM.T && !state.plantedAt && state.round === ROUND.LIVE && this.hasBomb) {
+          const nearSite = nearAny({ x: this.x, y: this.y }, [...A_SITES, ...B_SITES], 40)
+          if (nearSite) tryPlant(this)
+        }
+        if (this.team === TEAM.CT && state.round === ROUND.PLANTED && state.bombPos) {
+          if (dist(this.x, this.y, state.bombPos.x, state.bombPos.y) < 32) tryDefuse(this)
+        }
+      }
+    }
+
+    // Player
+    class Player extends Entity {
+      constructor(x, y, team) {
+        super(x, y, team, false)
+        this.name = 'You'
+      }
+      update(dt) {
+        const mx = (keys.has('w') ? -1 : 0) + (keys.has('s') ? 1 : 0)
+        const my = (keys.has('a') ? -1 : 0) + (keys.has('d') ? 1 : 0)
+        const stick = leftStick.get()
+        const mvx = clamp(my + stick.y, -1, 1)
+        const mvy = clamp(mx + stick.x, -1, 1)
+        const aimStick = rightStick.get()
+        let ax = Math.cos(this.dir), ay = Math.sin(this.dir)
+        if (aimStick.x !== 0 || aimStick.y !== 0) {
+          ax = aimStick.x; ay = aimStick.y
+        } else {
+          ax = (mouse.x - this.x) / Math.max(1, dist(this.x, this.y, mouse.x, mouse.y))
+          ay = (mouse.y - this.y) / Math.max(1, dist(this.x, this.y, mouse.x, mouse.y))
+        }
+        this.dir = Math.atan2(ay, ax)
+        super.update(dt, { mx: mvy, my: mvx, ax, ay })
+        if ((mouse.down || keys.has(' ')) && state.round !== ROUND.FREEZE) {
+          if (this.weapon && (this.weapon.autofire || now() - this.lastShot > 200)) this.tryShoot(this.x + ax * 1000, this.y + ay * 1000)
+        }
+        if (keys.has('r')) reloadWeapon(this)
+        if (keys.has('e')) {
+          if (this.team === TEAM.T && !state.plantedAt && state.round === ROUND.LIVE && this.hasBomb) tryPlant(this)
+          if (this.team === TEAM.CT && state.round === ROUND.PLANTED && state.bombPos) if (dist(this.x, this.y, state.bombPos.x, state.bombPos.y) < 32) tryDefuse(this)
+        }
+      }
+    }
+
+    function nearAny(p, cells, radius) {
+      for (const c of cells) { if (dist(p.x, p.y, (c.x + 0.5) * TILE, (c.y + 0.5) * TILE) < radius) return c }
+      return null
+    }
+
+    function tryPlant(p) {
+      if (p.isPlanting || state.round !== ROUND.LIVE) return
+      p.isPlanting = true
+      p.plantStart = now()
+      toast('Planting...')
+      sfx.plant()
+      setTimeout(() => {
+        if (state.round !== ROUND.LIVE) return
+        state.round = ROUND.PLANTED
+        state.plantedAt = nearAny({ x: p.x, y: p.y }, [...A_SITES, ...B_SITES], 80) ? 'SITE' : 'SITE'
+        state.plantedTime = now()
+        state.bombPos = { x: p.x, y: p.y }
+        p.hasBomb = false
+        toast('Bomb planted!')
+      }, 3000)
+    }
+
+    function tryDefuse(p) {
+      if (p.isDefusing || state.round !== ROUND.PLANTED) return
+      p.isDefusing = true
+      p.defuseStart = now()
+      toast('Defusing...')
+      sfx.defuse()
+      setTimeout(() => {
+        if (state.round !== ROUND.PLANTED) return
+        state.round = ROUND.POST
+        state.bombPos = null
+        state.plantedAt = null
+        roundWin(TEAM.CT, 'Bomb defused')
+      }, 5000)
+    }
+
+    function roundWin(team, reason) {
+      if (team === TEAM.T) { state.tScore++; sfx.win() } else { state.ctScore++; sfx.win() }
+      toast(`${team === TEAM.T ? 'Attackers' : 'Defenders'} win — ${reason}`)
+      state.round = ROUND.POST
+      document.getElementById('scoreT').textContent = state.tScore
+      document.getElementById('scoreCT').textContent = state.ctScore
+      setTimeout(() => startRound(), state.postTime * 1000)
+    }
+
+    // Visuals
+    function drawMap() {
+      // floor
+      for (let y = 0; y < MAP_H; y++) {
+        for (let x = 0; x < MAP_W; x++) {
+          const cell = MAP[y][x]
+          const px = x * TILE
+          const py = y * TILE
+          if (cell === '1') {
+            ctx.fillStyle = COLORS.wall
+            ctx.fillRect(px, py, TILE, TILE)
+            ctx.strokeStyle = COLORS.wallEdge
+            ctx.globalAlpha = 0.3
+            ctx.strokeRect(px + 0.5, py + 0.5, TILE - 1, TILE - 1)
+            ctx.globalAlpha = 1
+          } else {
+            const g = ctx.createLinearGradient(px, py, px + TILE, py + TILE)
+            g.addColorStop(0, COLORS.floor)
+            g.addColorStop(1, COLORS.floor2)
+            ctx.fillStyle = g
+            ctx.fillRect(px, py, TILE, TILE)
+            if (cell === 'A') {
+              ctx.strokeStyle = COLORS.siteA
+              ctx.globalAlpha = 0.4
+              ctx.lineWidth = 3
+              ctx.strokeRect(px + 6, py + 6, TILE - 12, TILE - 12)
+              ctx.globalAlpha = 1
+            } else if (cell === 'B') {
+              ctx.strokeStyle = COLORS.siteB
+              ctx.globalAlpha = 0.4
+              ctx.lineWidth = 3
+              ctx.strokeRect(px + 6, py + 6, TILE - 12, TILE - 12)
+              ctx.globalAlpha = 1
+            }
+          }
+        }
+      }
+    }
+
+    function drawEntities() {
+      for (const e of state.entities) {
+        const color = e.team === TEAM.T ? COLORS.t : COLORS.ct
+        // body
+        ctx.beginPath()
+        ctx.fillStyle = color
+        ctx.globalAlpha = 0.12
+        ctx.arc(e.x + 3, e.y + 4, e.r + 4, 0, TWO_PI)
+        ctx.fill()
+        ctx.globalAlpha = 1
+        ctx.beginPath()
+        const g = ctx.createRadialGradient(e.x - 4, e.y - 4, 4, e.x, e.y, e.r)
+        g.addColorStop(0, 'rgba(255,255,255,0.9)')
+        g.addColorStop(1, color)
+        ctx.fillStyle = g
+        ctx.arc(e.x, e.y, e.r, 0, TWO_PI)
+        ctx.fill()
+        // gun direction line
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.moveTo(e.x, e.y)
+        ctx.lineTo(e.x + Math.cos(e.dir) * (e.r + 10), e.y + Math.sin(e.dir) * (e.r + 10))
+        ctx.stroke()
+        // HP indicator
+        const w = 28
+        const hpw = Math.max(0, (e.hp / 100) * w)
+        ctx.fillStyle = 'rgba(0,0,0,0.4)'
+        ctx.fillRect(e.x - w/2, e.y - e.r - 14, w, 6)
+        ctx.fillStyle = '#22c55e'
+        ctx.fillRect(e.x - w/2, e.y - e.r - 14, hpw, 6)
+        // name
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'
+        ctx.font = '700 12px Inter, system-ui'
+        ctx.textAlign = 'center'
+        ctx.fillText(e.name, e.x, e.y - e.r - 22)
+      }
+    }
+
+    function drawBomb() {
+      if (!state.bombPos) return
+      const b = state.bombPos
+      ctx.fillStyle = COLORS.bomb
+      ctx.beginPath()
+      ctx.arc(b.x, b.y, 8, 0, TWO_PI)
+      ctx.fill()
+      // beep indicator
+      if (state.round === ROUND.PLANTED) {
+        const t = (now() - state.plantedTime) / 1000
+        if ((t * 2 | 0) % 2 === 0) sfx.beep()
+      }
+    }
+
+    function drawBullets() {
+      for (const p of state.particles) {
+        ctx.globalAlpha = p.a
+        ctx.fillStyle = p.c
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.r, 0, TWO_PI)
+        ctx.fill()
+        ctx.globalAlpha = 1
+      }
+    }
+
+    function spawnHit(x, y) {
+      state.particles.push({ x, y, r: 3, a: 1, c: '#fff', life: 0.25 })
+    }
+
+    function updateParticles(dt) {
+      state.particles = state.particles.filter(p => {
+        p.life -= dt
+        p.a = Math.max(0, p.life / 0.25)
+        p.r += dt * 40
+        return p.life > 0
+      })
+    }
+
+    function playShot(e) {
+      if (!e.weapon) return
+      if (e.weapon === WEAPONS.AWP || e.weapon.name === 'AWP') sfx.awp(); else sfx.shot()
+    }
+
+    // Round lifecycle
+    function equipTeams() {
+      for (const e of state.entities) {
+        e.equipDefault()
+        e.money = MONEY_START
+        e.hp = 100
+      }
+      const tTeam = state.entities.filter(e => e.team === TEAM.T)
+      if (tTeam.length) {
+        const carrier = choice(tTeam)
+        carrier.hasBomb = true
+      }
+      updateHUD()
+    }
+
+    function startRound() {
+      state.round = ROUND.FREEZE
+      state.timeLeft = 115
+      state.plantedAt = null
+      state.bombPos = null
+      for (const e of state.entities) e.spawn()
+      equipTeams()
+      showBuy(true)
+      document.getElementById('status').textContent = 'Buy Phase'
+      setTimeout(() => { if (state.round === ROUND.FREEZE) { state.round = ROUND.LIVE; showBuy(false); toast('Go!'); document.getElementById('status').textContent = 'Live' } }, state.freezeTime * 1000)
+    }
+
+    function endRoundCheck() {
+      if (state.round === ROUND.LIVE) {
+        const aliveT = state.entities.some(e => e.team === TEAM.T && e.hp > 0)
+        const aliveCT = state.entities.some(e => e.team === TEAM.CT && e.hp > 0)
+        if (!aliveT) return roundWin(TEAM.CT, 'All enemies eliminated')
+        if (!aliveCT) return roundWin(TEAM.T, 'All enemies eliminated')
+      }
+      if (state.round === ROUND.PLANTED) {
+        const elapsed = (now() - state.plantedTime) / 1000
+        if (elapsed >= state.bombTimer) {
+          // explode
+          sfx.explode()
+          const bx = state.bombPos.x, by = state.bombPos.y
+          for (const e of state.entities) {
+            const d = dist(bx, by, e.x, e.y)
+            if (d < 160) e.hp = 0
+          }
+          state.bombPos = null
+          state.round = ROUND.POST
+          roundWin(TEAM.T, 'Bomb exploded')
+        }
+      }
+    }
+
+    // UI
+    function updateHUD() {
+      const me = player
+      if (!me) return
+      document.getElementById('weaponName').textContent = me.weapon ? me.weapon.name : 'Unarmed'
+      document.getElementById('ammo').textContent = me.weapon ? `${me.ammo.clip}/${me.ammo.reserve}` : '—'
+      document.getElementById('money').textContent = `$${me.money}`
+      const hp = clamp(me.hp, 0, 100)
+      const hpBar = document.getElementById('hpBar')
+      hpBar.style.background = `linear-gradient(90deg, var(--ok) ${hp}%, rgba(255,255,255,0.08) ${hp}%)`
+      const timer = document.getElementById('roundTimer')
+      const t = Math.max(0, Math.floor(state.timeLeft))
+      const mm = (t / 60) | 0
+      const ss = (t % 60) | 0
+      timer.textContent = `${mm}:${ss.toString().padStart(2, '0')}`
+    }
+
+    function toast(msg) {
+      const box = document.getElementById('toasts')
+      const el = document.createElement('div')
+      el.className = 'toast'
+      el.textContent = msg
+      box.appendChild(el)
+      setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-6px)'; }, 2200)
+      setTimeout(() => el.remove(), 2700)
+    }
+
+    function toggleScore(show) {
+      document.getElementById('scoreboard').classList.toggle('show', !!show)
+      if (show) renderBoard()
+    }
+    function renderBoard() {
+      const rows = document.getElementById('boardRows')
+      rows.innerHTML = '<div class="tr th"><div class="td">Player</div><div class="td">Kills</div><div class="td">Deaths</div><div class="td">Money</div></div>'
+      for (const e of state.entities) {
+        const r = document.createElement('div'); r.className = 'tr'
+        r.innerHTML = `<div class="td">${e.name} <span style="opacity:.6">(${e.team})</span></div><div class="td">${e.kills}</div><div class="td">${e.deaths}</div><div class="td">$${e.money}</div>`
+        rows.appendChild(r)
+      }
+    }
+
+    function showBuy(show) { document.getElementById('buy').classList.toggle('show', !!show) }
+    function toggleBuy() { if (state.round === ROUND.FREEZE) { showBuy(!document.getElementById('buy').classList.contains('show')) } }
+
+    function buildBuy() {
+      const grid = document.getElementById('buyGrid')
+      grid.innerHTML = ''
+      for (const item of BUY_ITEMS) {
+        const spec = WEAPONS[item.key]
+        const card = document.createElement('div'); card.className = 'card'
+        card.innerHTML = `
+          <div class="row"><div class="name">${spec.name}</div><div>$${spec.price}</div></div>
+          <div style="opacity:.8">DMG ${spec.dmg} • RPM ${spec.rpm} • Spread ${(spec.spread*100).toFixed(1)}%</div>
+          <button class="btn-buy">Buy</button>
+        `
+        const btn = card.querySelector('button')
+        btn.addEventListener('click', () => {
+          if (player.money >= spec.price) {
+            if (item.allow && item.allow !== player.team) { sfx.error(); return }
+            player.money -= spec.price
+            player.giveWeapon(spec)
+            sfx.buy()
+            updateHUD()
+          } else sfx.error()
+        })
+        grid.appendChild(card)
+      }
+    }
+
+    // Minimap
+    function drawMinimap() {
+      const scaleX = mini.width / (MAP_W * TILE)
+      const scaleY = mini.height / (MAP_H * TILE)
+      mctx.clearRect(0, 0, mini.width, mini.height)
+      for (let y = 0; y < MAP_H; y++) {
+        for (let x = 0; x < MAP_W; x++) {
+          const cell = MAP[y][x]
+          const px = x * TILE * scaleX
+          const py = y * TILE * scaleY
+          const w = TILE * scaleX
+          const h = TILE * scaleY
+          if (cell === '1') {
+            mctx.fillStyle = 'rgba(255,255,255,0.14)'
+            mctx.fillRect(px, py, w, h)
+          } else {
+            mctx.fillStyle = 'rgba(255,255,255,0.06)'
+            mctx.fillRect(px, py, w, h)
+          }
+          if (cell === 'A') { mctx.strokeStyle = COLORS.siteA; mctx.strokeRect(px+2, py+2, w-4, h-4) }
+          if (cell === 'B') { mctx.strokeStyle = COLORS.siteB; mctx.strokeRect(px+2, py+2, w-4, h-4) }
+        }
+      }
+      for (const e of state.entities) {
+        mctx.fillStyle = e.team === TEAM.T ? COLORS.t : COLORS.ct
+        const px = e.x * scaleX
+        const py = e.y * scaleY
+        mctx.beginPath(); mctx.arc(px, py, 4, 0, TWO_PI); mctx.fill()
+      }
+      if (state.bombPos) { mctx.fillStyle = COLORS.bomb; mctx.beginPath(); mctx.arc(state.bombPos.x * scaleX, state.bombPos.y * scaleY, 4, 0, TWO_PI); mctx.fill() }
+    }
+
+    // Game loop
+    let player = null
+    function init() {
+      resize()
+      buildBuy()
+      // Create entities
+      player = new Player(0, 0, TEAM.T)
+      state.entities.push(player)
+      // Bots
+      state.entities.push(new Bot(0, 0, TEAM.T))
+      state.entities.push(new Bot(0, 0, TEAM.T))
+      state.entities.push(new Bot(0, 0, TEAM.CT))
+      state.entities.push(new Bot(0, 0, TEAM.CT))
+      state.entities.push(new Bot(0, 0, TEAM.CT))
+      startRound()
+      requestAnimationFrame(loop)
+    }
+
+    let last = now()
+    function loop() {
+      const t = now()
+      const dt = Math.min(0.033, (t - last) / 1000)
+      last = t
+      update(dt)
+      render()
+      requestAnimationFrame(loop)
+    }
+
+    function update(dt) {
+      if (state.round === ROUND.FREEZE) state.timeLeft = clamp(state.timeLeft, 0, 115)
+      else if (state.round === ROUND.LIVE) state.timeLeft -= dt
+      else if (state.round === ROUND.PLANTED) {}
+      updateParticles(dt)
+      for (const e of state.entities) e.update(dt)
+      endRoundCheck()
+      updateHUD()
+      if (state.round === ROUND.PLANTED && state.bombPos) {
+        // periodic beeps speed up over time
+        const elapsed = (now() - state.plantedTime) / 1000
+        if ((elapsed * (1 + elapsed / 10) | 0) % 5 === 0) {}
+      }
+      drawMinimap()
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      drawMap()
+      drawBomb()
+      drawEntities()
+      drawBullets()
+      // vignette
+      const g = ctx.createRadialGradient(WIDTH/2, HEIGHT/2, 200, WIDTH/2, HEIGHT/2, Math.max(WIDTH, HEIGHT)/1.1)
+      g.addColorStop(0, 'rgba(0,0,0,0)')
+      g.addColorStop(1, 'rgba(0,0,0,0.5)')
+      ctx.fillStyle = g
+      ctx.fillRect(0,0,WIDTH,HEIGHT)
+    }
+
+    // Kick off
+    init()
+  })()
+  </script>
+</body>
+</html>
