@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bird Flying Around Earth — Pure HTML/CSS</title>
+  <style>
+    :root {
+      --space-1: #030712;
+      --space-2: #0a1020;
+      --earth-ocean-1: #0b74c6;
+      --earth-ocean-2: #003a70;
+      --earth-aqua: #49d3ff;
+      --earth-land: #2cc07c;
+      --cloud: rgba(255, 255, 255, 0.9);
+      --bird-body: #ffffff;
+      --bird-shade: #e6eef7;
+      --bird-beak: #ffb703;
+      --bird-eye: #0f172a;
+      --glow: rgba(56, 189, 248, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 70% 10%, rgba(29, 78, 216, 0.08), transparent 40%),
+        radial-gradient(circle at 20% 90%, rgba(56, 189, 248, 0.06), transparent 45%),
+        linear-gradient(180deg, var(--space-1), var(--space-2) 60%, #000 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .scene {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      perspective: 900px;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.12) 0 1px, transparent 1px 100px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0 1px, transparent 1px 120px),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0 1px, transparent 1px 140px);
+      background-size: 260px 260px, 320px 320px, 360px 360px;
+      background-repeat: repeat;
+    }
+
+    /* Earth */
+    .earth {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background:
+        radial-gradient(60% 60% at 35% 30%, var(--earth-aqua), rgba(73, 211, 255, 0.1) 60%),
+        radial-gradient(100% 100% at 50% 50%, var(--earth-ocean-1), var(--earth-ocean-2) 65%, #00142d 100%);
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.05) inset,
+        0 0 40px 12px var(--glow),
+        0 40px 120px rgba(0,0,0,0.8);
+      z-index: 2;
+    }
+
+    /* Subtle day/night terminator */
+    .earth::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(120% 100% at 75% 40%, transparent 55%, rgba(0, 8, 28, 0.55) 75%, rgba(0, 6, 20, 0.9) 100%);
+      pointer-events: none;
+    }
+
+    /* Impressionistic landmasses */
+    .land {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(40% 28% at 34% 42%, rgba(44,192,124,0.9) 0 95%, transparent 96%),
+        radial-gradient(26% 20% at 60% 60%, rgba(44,192,124,0.85) 0 95%, transparent 96%),
+        radial-gradient(22% 16% at 18% 76%, rgba(44,192,124,0.8) 0 95%, transparent 96%),
+        radial-gradient(30% 22% at 76% 42%, rgba(44,192,124,0.8) 0 95%, transparent 96%),
+        radial-gradient(16% 12% at 70% 78%, rgba(44,192,124,0.75) 0 95%, transparent 96%);
+      filter: blur(1.2px) saturate(110%);
+      mix-blend-mode: overlay;
+      animation: drift 120s linear infinite;
+      opacity: 0.9;
+    }
+
+    @keyframes drift {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Clouds */
+    .clouds {
+      position: absolute;
+      inset: -2%;
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(from 0deg, rgba(255,255,255,0.08) 0 12deg, transparent 12deg 26deg);
+      filter: blur(2.5px);
+      mix-blend-mode: screen;
+      animation: clouds 60s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes clouds {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+
+    /* Orbit wrapper rotates the bird around Earth */
+    .orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      animation: orbit 24s linear infinite;
+      z-index: 3;
+    }
+
+    /* Circular path radius: adjust translateX to set orbit distance */
+    .path {
+      transform: translateX(260px) rotateX(8deg);
+      transform-style: preserve-3d;
+    }
+
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Bird */
+    .bird {
+      position: relative;
+      width: 160px;
+      height: 110px;
+      transform-origin: 50% 50%;
+      /* Keep bird facing one direction while orbit rotates */
+      animation: counter 24s linear infinite;
+      will-change: transform;
+      filter: drop-shadow(0 6px 6px rgba(0,0,0,0.45));
+    }
+
+    @keyframes counter {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+
+    .bird .body {
+      position: absolute;
+      left: 22px;
+      top: 28px;
+      width: 120px;
+      height: 76px;
+      background: radial-gradient(120% 100% at 20% 40%, var(--bird-shade), var(--bird-body) 40%);
+      border-radius: 60% 70% 55% 45% / 55% 60% 40% 45%;
+    }
+
+    .bird .head {
+      position: absolute;
+      left: 0;
+      top: 20px;
+      width: 56px;
+      height: 56px;
+      background: var(--bird-body);
+      border-radius: 50%;
+      box-shadow: inset -6px -6px 12px rgba(0,0,0,0.06);
+    }
+
+    .bird .eye {
+      position: absolute;
+      left: 18px;
+      top: 40px;
+      width: 12px;
+      height: 12px;
+      background: var(--bird-eye);
+      border-radius: 50%;
+      box-shadow: 3px -3px 0 2px rgba(255,255,255,0.9) inset;
+    }
+
+    .bird .beak {
+      position: absolute;
+      left: -14px;
+      top: 44px;
+      width: 0;
+      height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-right: 22px solid var(--bird-beak);
+      transform: rotate(-8deg);
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.15));
+    }
+
+    .bird .tail {
+      position: absolute;
+      right: 6px;
+      top: 56px;
+      width: 26px;
+      height: 18px;
+      background: linear-gradient(180deg, var(--bird-shade), var(--bird-body));
+      clip-path: polygon(0% 0%, 100% 40%, 100% 60%, 0% 100%);
+      transform: rotate(10deg);
+      border-radius: 2px;
+    }
+
+    /* Wings */
+    .wing {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      top: 8px;
+      background: radial-gradient(100% 70% at 60% 40%, var(--bird-body), var(--bird-shade));
+      border-radius: 70% 30% 60% 60% / 70% 30% 60% 60%;
+      opacity: 0.98;
+      transform-origin: 80% 20%;
+      animation: flap 0.9s ease-in-out infinite;
+    }
+
+    .wing-left {
+      left: 34px;
+      transform: rotate(24deg);
+      z-index: 1;
+    }
+
+    .wing-right {
+      left: 46px;
+      transform: scaleX(-1) rotate(24deg);
+      filter: brightness(0.98);
+      z-index: 0;
+      opacity: 0.9;
+    }
+
+    @keyframes flap {
+      0%, 100% { transform: rotate(24deg) translateY(0); }
+      50% { transform: rotate(-36deg) translateY(-8px); }
+    }
+
+    /* Subtle banking while flying */
+    .bird { animation-name: counter, bank; animation-duration: 24s, 4.5s; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; }
+    @keyframes bank {
+      0%, 100% { filter: drop-shadow(0 6px 6px rgba(0,0,0,0.45)); }
+      50% { filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
+    }
+
+    /* Foreground twinkles */
+    .twinkles {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.9) 0 1px, transparent 2px) 10% 30%/2px 2px no-repeat,
+        radial-gradient(circle, rgba(255,255,255,0.75) 0 1px, transparent 2px) 80% 70%/2px 2px no-repeat,
+        radial-gradient(circle, rgba(255,255,255,0.7) 0 1px, transparent 2px) 50% 80%/2px 2px no-repeat,
+        radial-gradient(circle, rgba(255,255,255,0.65) 0 1px, transparent 2px) 20% 60%/2px 2px no-repeat;
+      animation: twinkle 3.6s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.5; }
+      to   { opacity: 1; }
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 640px) {
+      .earth { width: 240px; height: 240px; }
+      .path { transform: translateX(200px) rotateX(8deg); }
+      .bird { width: 130px; height: 96px; }
+      .bird .body { width: 100px; height: 66px; left: 18px; top: 28px; }
+      .bird .head { width: 46px; height: 46px; }
+      .wing { width: 92px; height: 92px; }
+    }
+  </style>
+  <meta name="description" content="A pure HTML/CSS animation of a large bird flying around a glowing Earth, no JavaScript." />
+  <meta name="color-scheme" content="dark light">
+  <link rel="preload" as="style" href="#" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230b74c6'/%3E%3Ccircle cx='28' cy='26' r='10' fill='%2349d3ff'/%3E%3C/svg%3E">
+  <style>
+    /* Hide preload noop link if any */
+    link[as="style"][href="#"]{ display:none }
+  </style>
+  </head>
+<body>
+  <div class="scene" aria-label="A bird flying around the Earth">
+    <div class="earth" role="img" aria-label="Earth">
+      <div class="land" aria-hidden="true"></div>
+      <div class="clouds" aria-hidden="true"></div>
+    </div>
+
+    <div class="orbit" aria-hidden="false">
+      <div class="path">
+        <div class="bird" role="img" aria-label="Bird">
+          <div class="body"></div>
+          <div class="wing wing-left"></div>
+          <div class="wing wing-right"></div>
+          <div class="head"></div>
+          <div class="eye"></div>
+          <div class="beak"></div>
+          <div class="tail"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="twinkles" aria-hidden="true"></div>
+  </div>
+</body>
+</html>
+
+
