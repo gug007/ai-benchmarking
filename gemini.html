@@ -3,371 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS: Gemini Edition</title>
+    <title>Bird Flying Around Earth - Gemini</title>
     <style>
-        :root {
-            --background-color: #1a1a1a;
-            --primary-color: #00aaff;
-            --text-color: #f0f0f0;
-            --container-color: #2a2a2a;
-            --danger-color: #ff4d4d;
-            --success-color: #4dff4d;
-            --font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: var(--font-family);
-            background-color: var(--background-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
-            overflow: hidden;
-            user-select: none;
-        }
-
-        .game-container {
-            width: 800px;
-            height: 600px;
-            background-color: var(--container-color);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
+            background: radial-gradient(ellipse at center, #0f2027 0%, #203a43 50%, #2c5364 100%);
             overflow: hidden;
             display: flex;
-            flex-direction: column;
-        }
-
-        .game-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            background: rgba(42, 42, 42, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 10;
-        }
-
-        .screen-hidden {
-            opacity: 0;
-            transform: scale(1.1);
-            pointer-events: none;
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            text-shadow: 0 0 15px var(--primary-color);
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            max-width: 80%;
-            text-align: center;
-        }
-
-        .btn {
-            background-color: var(--primary-color);
-            color: var(--background-color);
-            border: none;
-            padding: 1rem 2.5rem;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 25px rgba(0, 170, 255, 0.8);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        #hud {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem 2rem;
-            background: rgba(0, 0, 0, 0.2);
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        #hud .stat {
-            display: flex;
-            align-items: center;
-        }
-
-        #hud .stat-label {
-            margin-right: 0.5rem;
-            opacity: 0.7;
-            font-size: 1rem;
-        }
-
-        #timer { color: var(--primary-color); }
-        #score { color: var(--success-color); }
-        #accuracy { color: var(--danger-color); }
-
-
-        #game-area {
-            flex-grow: 1;
             position: relative;
-            cursor: crosshair;
-            background-image: 
-                linear-gradient(rgba(42, 42, 42, 0.95), rgba(42, 42, 42, 0.95)),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="%23333" fill-opacity="0.4"><rect x="50" width="50" height="50" /><rect y="50" width="50" height="50" /></g></svg>');
+            font-family: Arial, Helvetica, sans-serif;
         }
-        
-        .target {
+
+        .stars { position: absolute; inset: 0; }
+        .stars::before, .stars::after {
+            content: '';
             position: absolute;
-            width: 50px;
-            height: 50px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s ease-out, opacity 0.2s ease-out;
-            box-shadow: 0 0 15px var(--primary-color);
+            width: 2px; height: 2px; background: #fff; border-radius: 50%;
+            box-shadow:
+                30vw 10vh #fff, 40vw 30vh #fff, 60vw 15vh #fff, 80vw 35vh #fff,
+                20vw 50vh #fff, 50vw 70vh #fff, 70vw 60vh #fff, 10vw 80vh #fff,
+                15vw 20vh #fff, 35vw 25vh #fff, 55vw 40vh #fff, 75vw 45vh #fff,
+                25vw 65vh #fff, 45vw 55vh #fff, 65vw 75vh #fff, 85vw 20vh #fff;
+            opacity: 0.8;
+            animation: twinkle 3s linear infinite alternate;
+        }
+        .stars::after { transform: scale(1.3); opacity: 0.5; }
+        @keyframes twinkle { 0% { opacity: .3 } 100% { opacity: 1 } }
+
+        .earth-container { position: relative; width: 300px; height: 300px; }
+        .earth {
+            width: 100%; height: 100%; border-radius: 50%; position: relative;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,.25) 0%, transparent 50%),
+                linear-gradient(45deg, #228B22 0%, #32CD32 25%, #4169E1 25%, #4169E1 50%, #228B22 50%, #228B22 75%, #4169E1 75%, #4169E1 100%);
+            background-size: 100% 100%, 60px 60px;
+            box-shadow: inset -30px -30px 50px rgba(0,0,0,.4), 0 0 50px rgba(65,105,225,.3);
+            animation: rotate-earth 20s linear infinite;
+        }
+        .earth::before {
+            content: '';
+            position: absolute; inset: 0; border-radius: 50%;
+            background-image:
+                radial-gradient(ellipse 40px 30px at 25% 30%, #228B22 40%, transparent 41%),
+                radial-gradient(ellipse 50px 35px at 70% 25%, #32CD32 40%, transparent 41%),
+                radial-gradient(ellipse 35px 25px at 60% 60%, #228B22 40%, transparent 41%),
+                radial-gradient(ellipse 45px 40px at 20% 70%, #32CD32 40%, transparent 41%),
+                radial-gradient(ellipse 30px 20px at 80% 75%, #228B22 40%, transparent 41%);
+        }
+        .earth::after {
+            content: '';
+            position: absolute; inset: -2% -2% -2% -2%; border-radius: 50%;
+            background-image:
+                radial-gradient(ellipse 20px 10px at 40% 20%, rgba(255,255,255,.6) 50%, transparent 51%),
+                radial-gradient(ellipse 15px 8px at 65% 40%, rgba(255,255,255,.5) 50%, transparent 51%),
+                radial-gradient(ellipse 18px 12px at 30% 65%, rgba(255,255,255,.6) 50%, transparent 51%),
+                radial-gradient(ellipse 12px 6px at 75% 70%, rgba(255,255,255,.5) 50%, transparent 51%);
+            animation: rotate-clouds 25s linear infinite;
+        }
+        @keyframes rotate-earth { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+        @keyframes rotate-clouds { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+
+        .orbit { position: absolute; top: 50%; left: 50%; width: 500px; height: 500px; border: 2px dashed rgba(255,255,255,.1); border-radius: 50%; transform: translate(-50%, -50%); }
+        .bird-orbit { position: absolute; top: 50%; left: 50%; width: 500px; height: 500px; transform: translate(-50%, -50%); animation: orbit 8s linear infinite; }
+        @keyframes orbit { from { transform: translate(-50%, -50%) rotate(0) } to { transform: translate(-50%, -50%) rotate(360deg) } }
+
+        .bird { position: absolute; top: 0; left: 50%; width: 60px; height: 40px; transform: translateX(-50%) translateY(-20px); animation: bird-tilt 8s linear infinite; }
+        @keyframes bird-tilt {
+            0% { transform: translateX(-50%) translateY(-20px) rotate(0) }
+            25% { transform: translateX(-50%) translateY(-20px) rotate(-15deg) }
+            50% { transform: translateX(-50%) translateY(-20px) rotate(0) }
+            75% { transform: translateX(-50%) translateY(-20px) rotate(15deg) }
+            100% { transform: translateX(-50%) translateY(-20px) rotate(0) }
         }
 
-        .target.hit {
-            background-color: var(--success-color);
-            transform: scale(1.2);
-            opacity: 0;
-        }
-        
-        .hit-marker {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--text-color);
-            opacity: 0;
-            transform: scale(0.5) rotate(45deg);
-            pointer-events: none;
-            transition: all 0.2s ease-out;
-        }
+        .bird-body { position: absolute; width: 35px; height: 22px; background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%); border-radius: 50%; top: 9px; left: 12px; z-index: 2; }
+        .bird-head { position: absolute; width: 20px; height: 20px; background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%); border-radius: 50%; top: 5px; left: 35px; z-index: 2; }
+        .bird-beak { position: absolute; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 12px solid #FFA500; top: 10px; left: 50px; z-index: 2; }
+        .bird-eye { position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%; top: 9px; left: 42px; z-index: 3; }
+        .bird-tail { position: absolute; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 25px solid #4A4A4A; top: 10px; left: -5px; z-index: 1; }
+        .wing { position: absolute; background: linear-gradient(45deg, #2F2F2F 0%, #555 50%, #2F2F2F 100%); border-radius: 50% 10% 50% 10%; transform-origin: bottom center; z-index: 1; }
+        .wing-left { width: 28px; height: 38px; top: 2px; left: 8px; animation: flap-left .25s ease-in-out infinite; }
+        .wing-right { width: 28px; height: 38px; top: 2px; right: 8px; animation: flap-right .25s ease-in-out infinite; }
+        @keyframes flap-left { 0%,100% { transform: rotate(-50deg) scaleY(1) } 50% { transform: rotate(-25deg) scaleY(.7) } }
+        @keyframes flap-right { 0%,100% { transform: rotate(50deg) scaleY(1) } 50% { transform: rotate(25deg) scaleY(.7) } }
 
-        .hit-marker.show {
-            opacity: 1;
-            transform: scale(1) rotate(45deg);
-        }
-
-        .final-stats {
-            display: flex;
-            justify-content: space-around;
-            width: 80%;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .final-stats .stat-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-
-        .final-stats .stat-label {
-            font-size: 1rem;
-            opacity: 0.7;
-        }
+        .title { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 26px; font-weight: 700; text-shadow: 2px 2px 6px rgba(0,0,0,.45); letter-spacing: 1px; }
     </style>
 </head>
 <body>
+    <div class="stars"></div>
+    <div class="title">Bird Flying Around Earth</div>
 
-    <div class="game-container">
-        <!-- Start Screen -->
-        <div id="start-screen" class="game-screen">
-            <h1>CS: Gemini Edition</h1>
-            <p>Test your aim. Click the targets as fast as you can before time runs out.</p>
-            <button id="start-btn" class="btn">Start Game</button>
-        </div>
-
-        <!-- Game Over Screen -->
-        <div id="game-over-screen" class="game-screen screen-hidden">
-            <h2>Game Over</h2>
-            <div class="final-stats">
-                <div>
-                    <div id="final-score" class="stat-value">0</div>
-                    <div class="stat-label">SCORE</div>
-                </div>
-                <div>
-                    <div id="final-accuracy" class="stat-value">0%</div>
-                    <div class="stat-label">ACCURACY</div>
-                </div>
-            </div>
-            <button id="restart-btn" class="btn">Play Again</button>
-        </div>
-        
-        <!-- Main Game -->
-        <div id="hud">
-            <div class="stat">
-                <span class="stat-label">Time:</span>
-                <span id="timer">30</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Score:</span>
-                <span id="score">0</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">Accuracy:</span>
-                <span id="accuracy">100%</span>
-            </div>
-        </div>
-        <div id="game-area">
-             <div class="hit-marker" id="hit-marker"></div>
-        </div>
+    <div class="earth-container">
+        <div class="earth"></div>
     </div>
 
-    <script>
-        const startScreen = document.getElementById('start-screen');
-        const gameOverScreen = document.getElementById('game-over-screen');
-        const startBtn = document.getElementById('start-btn');
-        const restartBtn = document.getElementById('restart-btn');
-
-        const gameArea = document.getElementById('game-area');
-        const timerEl = document.getElementById('timer');
-        const scoreEl = document.getElementById('score');
-        const accuracyEl = document.getElementById('accuracy');
-        
-        const finalScoreEl = document.getElementById('final-score');
-        const finalAccuracyEl = document.getElementById('final-accuracy');
-        const hitMarker = document.getElementById('hit-marker');
-
-        let score = 0;
-        let totalClicks = 0;
-        let hits = 0;
-        let timer;
-        let timeLeft = 30;
-        let gameInterval;
-
-        function startGame() {
-            startScreen.classList.add('screen-hidden');
-            gameOverScreen.classList.add('screen-hidden');
-            
-            // Reset stats
-            score = 0;
-            totalClicks = 0;
-            hits = 0;
-            timeLeft = 30;
-
-            updateHUD();
-
-            timer = setInterval(() => {
-                timeLeft--;
-                updateHUD();
-                if (timeLeft <= 0) {
-                    endGame();
-                }
-            }, 1000);
-            
-            gameInterval = setInterval(spawnTarget, 800);
-        }
-
-        function endGame() {
-            clearInterval(timer);
-            clearInterval(gameInterval);
-            gameArea.innerHTML = ''; // Clear remaining targets
-            gameArea.appendChild(hitMarker); // Re-add hitmarker
-
-            finalScoreEl.textContent = score;
-            finalAccuracyEl.textContent = calculateAccuracy() + '%';
-            
-            gameOverScreen.classList.remove('screen-hidden');
-        }
-        
-        function updateHUD() {
-            timerEl.textContent = timeLeft;
-            scoreEl.textContent = score;
-            accuracyEl.textContent = calculateAccuracy() + '%';
-        }
-
-        function calculateAccuracy() {
-            if (totalClicks === 0) return 100;
-            return Math.round((hits / totalClicks) * 100);
-        }
-        
-        function spawnTarget() {
-            const target = document.createElement('div');
-            target.classList.add('target');
-
-            const { width, height } = gameArea.getBoundingClientRect();
-            const targetSize = 50;
-
-            const x = Math.random() * (width - targetSize);
-            const y = Math.random() * (height - targetSize);
-
-            target.style.left = `${x}px`;
-            target.style.top = `${y}px`;
-            
-            target.addEventListener('click', (e) => {
-                e.stopPropagation();
-                hits++;
-                totalClicks++;
-                score += 100;
-                
-                target.classList.add('hit');
-                showHitMarker(e.clientX, e.clientY);
-
-                setTimeout(() => {
-                    if (target.parentNode) {
-                        target.parentNode.removeChild(target);
-                    }
-                }, 200);
-
-                updateHUD();
-            });
-
-            gameArea.appendChild(target);
-
-            setTimeout(() => {
-                if (target.parentNode && !target.classList.contains('hit')) {
-                   target.parentNode.removeChild(target);
-                }
-            }, 2000); // Target disappears after 2 seconds if not hit
-        }
-
-        function showHitMarker(x, y) {
-            const gameAreaRect = gameArea.getBoundingClientRect();
-            hitMarker.style.left = `${x - gameAreaRect.left - 10}px`;
-            hitMarker.style.top = `${y - gameAreaRect.top - 10}px`;
-            hitMarker.classList.add('show');
-            setTimeout(() => hitMarker.classList.remove('show'), 150);
-        }
-
-        gameArea.addEventListener('click', () => {
-            totalClicks++;
-            score -= 10;
-            updateHUD();
-        });
-
-        startBtn.addEventListener('click', startGame);
-        restartBtn.addEventListener('click', startGame);
-
-    </script>
+    <div class="orbit"></div>
+    <div class="bird-orbit">
+        <div class="bird">
+            <div class="wing wing-left"></div>
+            <div class="wing wing-right"></div>
+            <div class="bird-tail"></div>
+            <div class="bird-body"></div>
+            <div class="bird-head"></div>
+            <div class="bird-beak"></div>
+            <div class="bird-eye"></div>
+        </div>
+    </div>
 </body>
 </html>
+

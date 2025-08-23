@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Flying Around Earth - GPT-5</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            height: 100vh;
+            background: radial-gradient(ellipse at center, #0b0f1d 0%, #0f1b33 55%, #09101e 100%);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Stars */
+        .stars { position: absolute; inset: 0; }
+        .stars::before, .stars::after {
+            content: '';
+            position: absolute;
+            width: 2px; height: 2px; background: #fff; border-radius: 50%;
+            box-shadow:
+                10vw 15vh #fff, 20vw 25vh #fff, 30vw 10vh #fff, 40vw 35vh #fff,
+                50vw 40vh #fff, 60vw 20vh #fff, 70vw 30vh #fff, 80vw 50vh #fff,
+                15vw 65vh #fff, 35vw 55vh #fff, 55vw 70vh #fff, 75vw 75vh #fff,
+                25vw 80vh #fff, 45vw 20vh #fff, 65vw 15vh #fff, 85vw 25vh #fff;
+            opacity: .8;
+            animation: twinkle 3s linear infinite alternate;
+        }
+        .stars::after { transform: scale(1.35); opacity: .45; }
+        @keyframes twinkle { 0% { opacity: .35 } 100% { opacity: 1 } }
+
+        /* Earth */
+        .earth-container { position: relative; width: 300px; height: 300px; }
+        .earth {
+            width: 100%; height: 100%; border-radius: 50%; position: relative;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255,255,255,.25) 0%, transparent 50%),
+                linear-gradient(45deg, #228B22 0%, #32CD32 25%, #4169E1 25%, #4169E1 50%, #228B22 50%, #228B22 75%, #4169E1 75%, #4169E1 100%);
+            background-size: 100% 100%, 60px 60px;
+            box-shadow: inset -30px -30px 50px rgba(0,0,0,.4), 0 0 50px rgba(65,105,225,.3);
+            animation: rotate-earth 22s linear infinite;
+        }
+        .earth::before {
+            content: '';
+            position: absolute; inset: 0; border-radius: 50%;
+            background-image:
+                radial-gradient(ellipse 40px 30px at 25% 30%, #228B22 40%, transparent 41%),
+                radial-gradient(ellipse 50px 35px at 70% 25%, #32CD32 40%, transparent 41%),
+                radial-gradient(ellipse 35px 25px at 60% 60%, #228B22 40%, transparent 41%),
+                radial-gradient(ellipse 45px 40px at 20% 70%, #32CD32 40%, transparent 41%),
+                radial-gradient(ellipse 30px 20px at 80% 75%, #228B22 40%, transparent 41%);
+        }
+        .earth::after {
+            content: '';
+            position: absolute; inset: -2% -2% -2% -2%; border-radius: 50%;
+            background-image:
+                radial-gradient(ellipse 20px 10px at 40% 20%, rgba(255,255,255,.6) 50%, transparent 51%),
+                radial-gradient(ellipse 15px 8px at 65% 40%, rgba(255,255,255,.5) 50%, transparent 51%),
+                radial-gradient(ellipse 18px 12px at 30% 65%, rgba(255,255,255,.6) 50%, transparent 51%),
+                radial-gradient(ellipse 12px 6px at 75% 70%, rgba(255,255,255,.5) 50%, transparent 51%);
+            animation: rotate-clouds 26s linear infinite;
+        }
+        @keyframes rotate-earth { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+        @keyframes rotate-clouds { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+
+        /* Orbit */
+        .orbit { position: absolute; top: 50%; left: 50%; width: 520px; height: 520px; border: 2px dashed rgba(255,255,255,.1); border-radius: 50%; transform: translate(-50%, -50%); }
+        .bird-orbit { position: absolute; top: 50%; left: 50%; width: 520px; height: 520px; transform: translate(-50%, -50%); animation: orbit 8s linear infinite; }
+        @keyframes orbit { from { transform: translate(-50%, -50%) rotate(0) } to { transform: translate(-50%, -50%) rotate(360deg) } }
+
+        /* Bird */
+        .bird { position: absolute; top: 0; left: 50%; width: 60px; height: 40px; transform: translateX(-50%) translateY(-20px); animation: bird-tilt 8s linear infinite; }
+        @keyframes bird-tilt {
+            0% { transform: translateX(-50%) translateY(-20px) rotate(0) }
+            25% { transform: translateX(-50%) translateY(-20px) rotate(-15deg) }
+            50% { transform: translateX(-50%) translateY(-20px) rotate(0) }
+            75% { transform: translateX(-50%) translateY(-20px) rotate(15deg) }
+            100% { transform: translateX(-50%) translateY(-20px) rotate(0) }
+        }
+        .bird-body { position: absolute; width: 35px; height: 22px; background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%); border-radius: 50%; top: 9px; left: 12px; z-index: 2; }
+        .bird-head { position: absolute; width: 20px; height: 20px; background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%); border-radius: 50%; top: 5px; left: 35px; z-index: 2; }
+        .bird-beak { position: absolute; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 12px solid #FFA500; top: 10px; left: 50px; z-index: 2; }
+        .bird-eye { position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%; top: 9px; left: 42px; z-index: 3; }
+        .bird-tail { position: absolute; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 25px solid #4A4A4A; top: 10px; left: -5px; z-index: 1; }
+        .wing { position: absolute; background: linear-gradient(45deg, #2F2F2F 0%, #555 50%, #2F2F2F 100%); border-radius: 50% 10% 50% 10%; transform-origin: bottom center; z-index: 1; }
+        .wing-left { width: 28px; height: 38px; top: 2px; left: 8px; animation: flap-left .22s ease-in-out infinite; }
+        .wing-right { width: 28px; height: 38px; top: 2px; right: 8px; animation: flap-right .22s ease-in-out infinite; }
+        @keyframes flap-left { 0%,100% { transform: rotate(-50deg) scaleY(1) } 50% { transform: rotate(-25deg) scaleY(.7) } }
+        @keyframes flap-right { 0%,100% { transform: rotate(50deg) scaleY(1) } 50% { transform: rotate(25deg) scaleY(.7) } }
+
+        .title { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 26px; font-weight: 700; text-shadow: 2px 2px 6px rgba(0,0,0,.45); letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="title">Bird Flying Around Earth</div>
+
+    <div class="earth-container">
+        <div class="earth"></div>
+    </div>
+
+    <div class="orbit"></div>
+    <div class="bird-orbit">
+        <div class="bird">
+            <div class="wing wing-left"></div>
+            <div class="wing wing-right"></div>
+            <div class="bird-tail"></div>
+            <div class="bird-body"></div>
+            <div class="bird-head"></div>
+            <div class="bird-beak"></div>
+            <div class="bird-eye"></div>
+        </div>
+    </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bird Flying Around Earth — GPT-5</title>
+    <style>
+      :root {
+        --bg: #060914;
+        --star: hsla(0, 0%, 100%, 0.9);
+        --ocean-deep: #071a43;
+        --ocean: #0a2a6b;
+        --atmosphere: rgba(30, 144, 255, 0.25);
+        --continent: #2ecc71;
+        --continent-dark: #1e9d58;
+        --cloud: #ffffff;
+        --bird: #f8fafc;
+        --bird-shadow: rgba(0, 0, 0, 0.35);
+        --orbit-duration: 18s;
+        --flap-duration: 900ms;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 600px at 50% 120%, #03050b, var(--bg));
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+
+      .scene {
+        position: relative;
+        width: min(90vmin, 720px);
+        height: min(90vmin, 720px);
+        isolation: isolate;
+      }
+
+      .stars {
+        position: absolute;
+        inset: -20% -20%;
+        background:
+          radial-gradient(1px 1px at 20% 10%, var(--star), transparent 60%),
+          radial-gradient(1px 1px at 80% 30%, var(--star), transparent 60%),
+          radial-gradient(1px 1px at 40% 60%, var(--star), transparent 60%),
+          radial-gradient(2px 2px at 65% 80%, var(--star), transparent 60%),
+          radial-gradient(1.5px 1.5px at 10% 70%, var(--star), transparent 60%),
+          radial-gradient(1px 1px at 90% 50%, var(--star), transparent 60%),
+          radial-gradient(1px 1px at 55% 15%, var(--star), transparent 60%),
+          radial-gradient(1px 1px at 30% 85%, var(--star), transparent 60%),
+          radial-gradient(2px 2px at 75% 12%, var(--star), transparent 60%);
+        opacity: 0.7;
+        filter: drop-shadow(0 0 2px var(--star));
+        animation: twinkle 12s linear infinite;
+        z-index: 0;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.65;
+        }
+        50% {
+          opacity: 0.9;
+        }
+      }
+
+      .earth {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40vmin;
+        height: 40vmin;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background:
+          radial-gradient(120% 120% at 30% 30%, rgba(255, 255, 255, 0.18), transparent 35%),
+          radial-gradient(100% 100% at 70% 70%, rgba(0, 0, 0, 0.35), transparent 55%),
+          radial-gradient(closest-side, var(--ocean), var(--ocean-deep));
+        box-shadow:
+          0 0 0 1.6vmin var(--atmosphere) inset,
+          0 0 35px 8px rgba(30, 144, 255, 0.25),
+          inset -18px -28px 60px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
+        z-index: 2;
+      }
+
+      .earth::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(16% 12% at 22% 38%, var(--continent) 0 70%, transparent 72%),
+          radial-gradient(20% 13% at 45% 60%, var(--continent) 0 70%, transparent 72%),
+          radial-gradient(12% 18% at 70% 35%, var(--continent) 0 70%, transparent 72%),
+          radial-gradient(14% 10% at 80% 65%, var(--continent) 0 70%, transparent 72%),
+          radial-gradient(10% 10% at 33% 80%, var(--continent) 0 70%, transparent 72%),
+          radial-gradient(8% 8% at 12% 65%, var(--continent-dark) 0 70%, transparent 72%),
+          radial-gradient(7% 7% at 58% 20%, var(--continent-dark) 0 70%, transparent 72%),
+          radial-gradient(7% 7% at 72% 78%, var(--continent-dark) 0 70%, transparent 72%);
+        filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.25))
+          drop-shadow(-2px -3px 1px rgba(0, 0, 0, 0.15));
+        background-size: 200% 100%;
+        background-repeat: repeat-x;
+        background-position: 0 0;
+        animation: drift 48s linear infinite;
+        mix-blend-mode: normal;
+      }
+
+      .earth::after {
+        content: "";
+        position: absolute;
+        inset: -4% -4%;
+        background:
+          radial-gradient(40% 10% at 20% 35%, rgba(255, 255, 255, 0.65) 0 30%, transparent 33%),
+          radial-gradient(30% 8% at 55% 50%, rgba(255, 255, 255, 0.5) 0 30%, transparent 35%),
+          radial-gradient(28% 8% at 75% 25%, rgba(255, 255, 255, 0.5) 0 30%, transparent 35%),
+          radial-gradient(24% 7% at 40% 75%, rgba(255, 255, 255, 0.45) 0 30%, transparent 35%),
+          radial-gradient(16% 5% at 80% 70%, rgba(255, 255, 255, 0.4) 0 30%, transparent 35%);
+        filter: blur(1.2px);
+        mix-blend-mode: screen;
+        opacity: 0.85;
+        background-size: 200% 100%;
+        background-position: 0 0;
+        animation: drift 60s linear infinite reverse;
+        clip-path: circle(50% at 50% 50%);
+        pointer-events: none;
+      }
+
+      @keyframes drift {
+        to {
+          background-position: -200% 0;
+        }
+      }
+
+      .orbit {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 64vmin;
+        height: 64vmin;
+        margin-left: -32vmin;
+        margin-top: -32vmin;
+        animation: revolve var(--orbit-duration) linear infinite;
+        z-index: 1;
+      }
+
+      .orbit::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.06));
+        pointer-events: none;
+      }
+
+      @keyframes revolve {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .bird {
+        position: absolute;
+        top: -2.1vmin;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4.2vmin;
+        height: 2.2vmin;
+        z-index: 3;
+        filter: drop-shadow(0.2vmin 0.35vmin 0.35vmin var(--bird-shadow));
+      }
+
+      .bird .body {
+        position: absolute;
+        left: 1.6vmin;
+        top: 0.5vmin;
+        width: 1.2vmin;
+        height: 1.2vmin;
+        background: var(--bird);
+        border-radius: 50%;
+      }
+
+      .bird .tail {
+        position: absolute;
+        left: 0.3vmin;
+        top: 0.9vmin;
+        width: 0.9vmin;
+        height: 0.5vmin;
+        background: var(--bird);
+        border-radius: 0.1vmin 0.5vmin 0.5vmin 0.1vmin / 50% 50% 50% 50%;
+        transform: rotate(10deg);
+      }
+
+      .bird .beak {
+        position: absolute;
+        right: 0.1vmin;
+        top: 0.9vmin;
+        width: 0;
+        height: 0;
+        border-top: 0.25vmin solid transparent;
+        border-bottom: 0.25vmin solid transparent;
+        border-left: 0.45vmin solid #f59e0b;
+      }
+
+      .wing {
+        position: absolute;
+        top: 0.1vmin;
+        width: 2.4vmin;
+        height: 1.8vmin;
+        background: var(--bird);
+        border-radius: 2.4vmin 2.4vmin 0.7vmin 0.7vmin / 1.6vmin 1.6vmin 0.5vmin 0.5vmin;
+        transform-origin: 0.3vmin 1.2vmin;
+      }
+
+      .wing.left {
+        left: 0.9vmin;
+        transform: rotate(10deg);
+        animation: flap-left var(--flap-duration) ease-in-out infinite;
+      }
+
+      .wing.right {
+        left: 1.7vmin;
+        transform: rotate(-10deg) scaleX(-1);
+        animation: flap-right var(--flap-duration) ease-in-out infinite;
+      }
+
+      @keyframes flap-left {
+        0%,
+        100% {
+          transform: rotate(12deg);
+        }
+        50% {
+          transform: rotate(-24deg);
+        }
+      }
+
+      @keyframes flap-right {
+        0%,
+        100% {
+          transform: rotate(-12deg) scaleX(-1);
+        }
+        50% {
+          transform: rotate(24deg) scaleX(-1);
+        }
+      }
+
+      .bird .eye {
+        position: absolute;
+        right: 1.1vmin;
+        top: 0.85vmin;
+        width: 0.22vmin;
+        height: 0.22vmin;
+        background: #0f172a;
+        border-radius: 50%;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .orbit,
+        .earth::before,
+        .earth::after,
+        .stars,
+        .wing.left,
+        .wing.right {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene" aria-label="Bird flying around the Earth">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="earth" role="img" aria-label="Planet Earth"></div>
+      <div class="orbit" aria-hidden="true">
+        <div class="bird" aria-label="Bird">
+          <div class="wing left"></div>
+          <div class="wing right"></div>
+          <div class="body"></div>
+          <div class="tail"></div>
+          <div class="beak"></div>
+          <div class="eye"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+
