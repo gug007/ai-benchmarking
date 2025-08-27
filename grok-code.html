@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grok Code - Duck on Scooter</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 100%);
+            width: 320px;
+            height: 320px;
+            position: relative;
+        }
+
+        .scene {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .duck-scooter {
+            position: absolute;
+            bottom: 60px;
+            left: -200px;
+            animation: ride 8s linear infinite;
+            transform-origin: center bottom;
+        }
+
+        .scooter {
+            position: relative;
+            width: 120px;
+            height: 80px;
+        }
+
+        .scooter-body {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(45deg, #FF4500, #FFA500);
+            border-radius: 20px 20px 10px 10px;
+            top: 20px;
+            left: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .scooter-seat {
+            position: absolute;
+            width: 50px;
+            height: 15px;
+            background: #8B4513;
+            border-radius: 15px 15px 10px 10px;
+            top: 10px;
+            left: 35px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .handlebars {
+            position: absolute;
+            width: 40px;
+            height: 4px;
+            background: #333;
+            top: 35px;
+            left: 10px;
+            border-radius: 2px;
+            transform: rotate(-10deg);
+        }
+
+        .handlebar-grips {
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            background: #666;
+            border-radius: 3px;
+            top: -4px;
+            left: -3px;
+        }
+
+        .handlebar-grips::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            background: #666;
+            border-radius: 3px;
+            top: 0;
+            right: -3px;
+        }
+
+        .front-wheel, .back-wheel {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #333;
+            border: 3px solid #666;
+            bottom: -10px;
+        }
+
+        .front-wheel {
+            left: 10px;
+            animation: rotate-wheel 0.5s linear infinite;
+        }
+
+        .back-wheel {
+            right: 10px;
+            animation: rotate-wheel 0.5s linear infinite reverse;
+        }
+
+        .wheel-spoke {
+            position: absolute;
+            width: 2px;
+            height: 8px;
+            background: #999;
+            top: 6px;
+            left: 9px;
+            border-radius: 1px;
+        }
+
+        .wheel-spoke:nth-child(2) { transform: rotate(45deg); }
+        .wheel-spoke:nth-child(3) { transform: rotate(90deg); }
+        .wheel-spoke:nth-child(4) { transform: rotate(135deg); }
+
+        .duck {
+            position: absolute;
+            top: -40px;
+            left: 30px;
+            width: 60px;
+            height: 50px;
+            animation: duck-bounce 0.3s ease-in-out infinite alternate;
+        }
+
+        .duck-body {
+            position: absolute;
+            width: 40px;
+            height: 35px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 10px;
+            left: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .duck-head {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            top: -5px;
+            left: 17px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .duck-beak {
+            position: absolute;
+            width: 12px;
+            height: 8px;
+            background: #FFA500;
+            border-radius: 0 50% 50% 50%;
+            top: 5px;
+            left: 3px;
+            transform: rotate(15deg);
+            animation: beak-flap 0.8s ease-in-out infinite;
+        }
+
+        .duck-eye {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+            top: 3px;
+            left: 8px;
+        }
+
+        .duck-wing {
+            position: absolute;
+            width: 20px;
+            height: 15px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            top: 8px;
+            left: 5px;
+            transform: rotate(-20deg);
+            animation: wing-flap 0.4s ease-in-out infinite alternate;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .duck-tail {
+            position: absolute;
+            width: 15px;
+            height: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50% 50% 50% 100%;
+            top: 30px;
+            left: 45px;
+            transform: rotate(20deg);
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(0deg, #90EE90, #98FB98);
+            border-top: 2px solid #228B22;
+        }
+
+        .cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+
+        .cloud:nth-child(1) {
+            width: 60px;
+            height: 20px;
+            top: 30px;
+            left: 50px;
+            animation: cloud-float 20s linear infinite;
+        }
+
+        .cloud:nth-child(2) {
+            width: 40px;
+            height: 15px;
+            top: 60px;
+            left: 200px;
+            animation: cloud-float 25s linear infinite reverse;
+        }
+
+        .cloud:nth-child(3) {
+            width: 50px;
+            height: 18px;
+            top: 40px;
+            left: 150px;
+            animation: cloud-float 18s linear infinite;
+        }
+
+        @keyframes ride {
+            0% { left: -200px; }
+            100% { left: 400px; }
+        }
+
+        @keyframes rotate-wheel {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes duck-bounce {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-3px); }
+        }
+
+        @keyframes wing-flap {
+            0% { transform: rotate(-20deg) scaleY(1); }
+            100% { transform: rotate(-10deg) scaleY(0.9); }
+        }
+
+        @keyframes beak-flap {
+            0% { transform: rotate(15deg); }
+            50% { transform: rotate(10deg); }
+            100% { transform: rotate(15deg); }
+        }
+
+        @keyframes cloud-float {
+            0% { transform: translateX(0px); }
+            100% { transform: translateX(320px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+
+        <div class="duck-scooter">
+            <div class="scooter">
+                <div class="scooter-seat"></div>
+                <div class="scooter-body"></div>
+                <div class="handlebars">
+                    <div class="handlebar-grips"></div>
+                </div>
+
+                <div class="front-wheel">
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                </div>
+
+                <div class="back-wheel">
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                </div>
+            </div>
+
+            <div class="duck">
+                <div class="duck-tail"></div>
+                <div class="duck-body"></div>
+                <div class="duck-head">
+                    <div class="duck-beak"></div>
+                    <div class="duck-eye"></div>
+                </div>
+                <div class="duck-wing"></div>
+            </div>
+        </div>
+
+        <div class="ground"></div>
+    </div>
+</body>
+</html>

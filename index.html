@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Benchmarking</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+      }
+
+      .iframe-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+      }
+
+      .iframe-container {
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .iframe-container h3 {
+        margin: 0 0 10px 0;
+        color: #555;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      iframe {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>AI Benchmarking</h1>
+
+      <div class="iframe-grid">
+        <div class="iframe-container">
+          <h3>Claude</h3>
+          <iframe
+            src="claude.html"
+            width="320"
+            height="320"
+            frameborder="0"
+          ></iframe>
+        </div>
+
+        <div class="iframe-container">
+          <h3>Grok Code</h3>
+          <iframe
+            src="grok-code.html"
+            width="320"
+            height="320"
+            frameborder="0"
+          ></iframe>
+        </div>
+        <div class="iframe-container">
+          <h3>Gemini</h3>
+          <iframe
+            src="gemini.html"
+            width="320"
+            height="320"
+            frameborder="0"
+          ></iframe>
+        </div>
+
+        <div class="iframe-container">
+          <h3>GPT-5</h3>
+          <iframe
+            src="gpt-5.html"
+            width="320"
+            height="320"
+            frameborder="0"
+          ></iframe>
+        </div>
+
+        <div class="iframe-container">
+          <h3>GPT-5 High</h3>
+          <iframe
+            src="gpt-5-high.html"
+            width="320"
+            height="320"
+            frameborder="0"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

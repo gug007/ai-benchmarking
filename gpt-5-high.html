@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPT-5 - Duck on a Scooter</title>
+    <style>
+      /* Constrain scene to 320×320 for iframe */
+      html, body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: #cfefff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .scene {
+        width: 320px;
+        height: 320px;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        background: linear-gradient(#eaf7ff 0%, #def3ff 55%, #bfe6ff 100%);
+        position: relative;
+      }
+      svg { width: 100%; height: 100%; display: block; }
+
+      /* Moving road stripes for extra motion parallax */
+      .stripe {
+        stroke: #ffffff;
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-dasharray: 28 18;
+        animation: stripeMove 1s linear infinite;
+      }
+      @keyframes stripeMove {
+        from { stroke-dashoffset: 0; }
+        to   { stroke-dashoffset: -92; }
+      }
+
+      /* Gentle cloud drift */
+      .cloud { opacity: 0.9; }
+      .cloud-slow { animation: cloudDrift 28s linear infinite; }
+      .cloud-fast { animation: cloudDrift 16s linear infinite; }
+      @keyframes cloudDrift {
+        0%   { transform: translateX(-360px); }
+        100% { transform: translateX(360px); }
+      }
+
+      /* Fallback CSS animations for rider (in addition to SVG SMIL) */
+      .rider-move {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: rideAcross 6.2s linear infinite;
+      }
+      @keyframes rideAcross {
+        0%   { transform: translateX(-360px); }
+        100% { transform: translateX(360px); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene" aria-label="Cartoon duck riding a scooter animation">
+      <svg viewBox="0 0 320 320" role="img">
+        <defs>
+          <linearGradient id="roadGrad" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#3f4654" />
+            <stop offset="100%" stop-color="#2e3440" />
+          </linearGradient>
+          <radialGradient id="wheelGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#5a6475" />
+            <stop offset="100%" stop-color="#2b2f37" />
+          </radialGradient>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" />
+          </filter>
+        </defs>
+
+        <!-- Sky embellishments -->
+        <g>
+          <g class="cloud cloud-slow" transform="translate(-140,40)">
+            <circle cx="30" cy="16" r="18" fill="#ffffff"/>
+            <circle cx="48" cy="14" r="14" fill="#ffffff"/>
+            <circle cx="64" cy="18" r="20" fill="#ffffff"/>
+            <rect x="22" y="22" width="52" height="16" rx="8" fill="#ffffff"/>
+          </g>
+          <g class="cloud cloud-fast" transform="translate(-240,86) scale(0.9)">
+            <circle cx="30" cy="16" r="16" fill="#ffffff"/>
+            <circle cx="46" cy="14" r="12" fill="#ffffff"/>
+            <circle cx="60" cy="18" r="16" fill="#ffffff"/>
+            <rect x="22" y="22" width="46" height="14" rx="7" fill="#ffffff"/>
+          </g>
+        </g>
+
+        <!-- Ground / road -->
+        <rect x="0" y="256" width="320" height="64" fill="url(#roadGrad)" />
+        <line class="stripe" x1="-200" y1="286" x2="520" y2="286" />
+
+        <!-- Rider track baseline at y=230 -->
+        <g transform="translate(0, 230)">
+          <!-- Rider group moves across the scene -->
+          <g id="rider" class="rider-move">
+            <!-- Primary motion path (SMIL) -->
+            <animateMotion dur="6.2s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" path="M -180 0 L 360 0" fill="freeze" />
+
+            <!-- Gentle bobbing -->
+            <g id="bob">
+              <animateTransform attributeName="transform" type="translate" dur="0.6s" values="0 0; 0 -3; 0 0" repeatCount="indefinite" />
+
+              <!-- Soft ground shadow following the rider -->
+              <ellipse cx="60" cy="54" rx="46" ry="10" fill="#000" opacity="0.18" filter="url(#shadow)" />
+
+              <!-- Scooter -->
+              <g id="scooter">
+                <!-- Deck -->
+                <rect x="12" y="22" width="96" height="10" rx="5" fill="#7dd3fc" stroke="#0ea5e9" stroke-width="2"/>
+
+                <!-- Front fork -->
+                <g transform="translate(96,10) rotate(-14)">
+                  <rect x="-3" y="0" width="6" height="28" rx="3" fill="#0ea5e9" />
+                  <!-- Handlebar -->
+                  <rect x="-14" y="-4" width="28" height="6" rx="3" fill="#0ea5e9" />
+                </g>
+
+                <!-- Wheels -->
+                <g id="backWheel">
+                  <circle cx="26" cy="40" r="18" fill="url(#wheelGrad)" />
+                  <circle cx="26" cy="40" r="6" fill="#1f2937" />
+                  <!-- Spokes to show rotation -->
+                  <g>
+                    <rect x="25" y="24" width="2" height="32" fill="#cbd5e1" />
+                    <rect x="10" y="39" width="32" height="2" fill="#cbd5e1" />
+                  </g>
+                  <animateTransform attributeName="transform" type="rotate" from="0 26 40" to="360 26 40" dur="1.2s" repeatCount="indefinite" />
+                </g>
+
+                <g id="frontWheel">
+                  <circle cx="106" cy="40" r="18" fill="url(#wheelGrad)" />
+                  <circle cx="106" cy="40" r="6" fill="#1f2937" />
+                  <g>
+                    <rect x="105" y="24" width="2" height="32" fill="#cbd5e1" />
+                    <rect x="90" y="39" width="32" height="2" fill="#cbd5e1" />
+                  </g>
+                  <animateTransform attributeName="transform" type="rotate" from="0 106 40" to="360 106 40" dur="1.2s" repeatCount="indefinite" />
+                </g>
+              </g>
+
+              <!-- Duck -->
+              <g id="duck" transform="translate(60, 6)">
+                <!-- Tail -->
+                <path d="M-22,8 c-8,-4 -8,-10 -2,-14 c6,2 10,6 12,10" fill="#fde047" stroke="#fbbf24" stroke-width="2"/>
+
+                <!-- Body -->
+                <ellipse cx="0" cy="0" rx="26" ry="20" fill="#fde047" stroke="#fbbf24" stroke-width="2"/>
+
+                <!-- Wing (flapping) -->
+                <g id="wing" transform="translate(-2,-2)">
+                  <path d="M-8,0 c6,-8 22,-4 22,6 c-10,2 -16,6 -22,-2 z" fill="#facc15" stroke="#eab308" stroke-width="2"/>
+                  <animateTransform attributeName="transform" type="rotate" values="-14 -2 -2; 10 -2 -2; -14 -2 -2" dur="0.6s" repeatCount="indefinite" />
+                </g>
+
+                <!-- Head -->
+                <g transform="translate(20,-12)">
+                  <circle cx="0" cy="0" r="12" fill="#fde047" stroke="#fbbf24" stroke-width="2"/>
+                  <!-- Eye with blink -->
+                  <ellipse cx="3" cy="-2" rx="2.6" ry="3.4" fill="#111827"/>
+                  <ellipse cx="3" cy="-2" rx="2.6" ry="3.4" fill="#111827">
+                    <animate attributeName="ry" values="3.4;0;3.4;3.4;3.4" dur="3.8s" repeatCount="indefinite"/>
+                  </ellipse>
+                  <!-- Beak -->
+                  <path d="M6,-1 l12,2 c2,2 -2,6 -8,6 l-6,-2 z" fill="#fb923c" stroke="#f97316" stroke-width="2"/>
+                </g>
+
+                <!-- Little scarf for extra charm -->
+                <path d="M8,-6 c8,-3 16,0 18,4 c-8,2 -14,4 -22,8" fill="#38bdf8" opacity="0.85"/>
+
+                <!-- Feet on deck -->
+                <g transform="translate(-6,16)">
+                  <rect x="-4" y="0" width="10" height="6" rx="2" fill="#f59e0b"/>
+                  <rect x="6" y="0" width="10" height="6" rx="2" fill="#f59e0b"/>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </body>
+  </html>
+
+

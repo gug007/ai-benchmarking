@@ -1,119 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bird Flying Around Earth - Gemini</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duck on a Scooter</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f8ff;
+    overflow: hidden;
+  }
 
-        body {
-            height: 100vh;
-            background: radial-gradient(ellipse at center, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+  .container {
+    width: 320px;
+    height: 320px;
+    border: 2px solid #ccc;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #87CEEB 0%, #E0F8D0 60%, #98FB98 100%);
+  }
 
-        .stars { position: absolute; inset: 0; }
-        .stars::before, .stars::after {
-            content: '';
-            position: absolute;
-            width: 2px; height: 2px; background: #fff; border-radius: 50%;
-            box-shadow:
-                30vw 10vh #fff, 40vw 30vh #fff, 60vw 15vh #fff, 80vw 35vh #fff,
-                20vw 50vh #fff, 50vw 70vh #fff, 70vw 60vh #fff, 10vw 80vh #fff,
-                15vw 20vh #fff, 35vw 25vh #fff, 55vw 40vh #fff, 75vw 45vh #fff,
-                25vw 65vh #fff, 45vw 55vh #fff, 65vw 75vh #fff, 85vw 20vh #fff;
-            opacity: 0.8;
-            animation: twinkle 3s linear infinite alternate;
-        }
-        .stars::after { transform: scale(1.3); opacity: 0.5; }
-        @keyframes twinkle { 0% { opacity: .3 } 100% { opacity: 1 } }
+  .scooter-duck {
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    animation: moveAcross 4s linear infinite;
+    transform: translateX(-120px);
+  }
 
-        .earth-container { position: relative; width: 300px; height: 300px; }
-        .earth {
-            width: 100%; height: 100%; border-radius: 50%; position: relative;
-            background:
-                radial-gradient(circle at 30% 30%, rgba(255,255,255,.25) 0%, transparent 50%),
-                linear-gradient(45deg, #228B22 0%, #32CD32 25%, #4169E1 25%, #4169E1 50%, #228B22 50%, #228B22 75%, #4169E1 75%, #4169E1 100%);
-            background-size: 100% 100%, 60px 60px;
-            box-shadow: inset -30px -30px 50px rgba(0,0,0,.4), 0 0 50px rgba(65,105,225,.3);
-            animation: rotate-earth 20s linear infinite;
-        }
-        .earth::before {
-            content: '';
-            position: absolute; inset: 0; border-radius: 50%;
-            background-image:
-                radial-gradient(ellipse 40px 30px at 25% 30%, #228B22 40%, transparent 41%),
-                radial-gradient(ellipse 50px 35px at 70% 25%, #32CD32 40%, transparent 41%),
-                radial-gradient(ellipse 35px 25px at 60% 60%, #228B22 40%, transparent 41%),
-                radial-gradient(ellipse 45px 40px at 20% 70%, #32CD32 40%, transparent 41%),
-                radial-gradient(ellipse 30px 20px at 80% 75%, #228B22 40%, transparent 41%);
-        }
-        .earth::after {
-            content: '';
-            position: absolute; inset: -2% -2% -2% -2%; border-radius: 50%;
-            background-image:
-                radial-gradient(ellipse 20px 10px at 40% 20%, rgba(255,255,255,.6) 50%, transparent 51%),
-                radial-gradient(ellipse 15px 8px at 65% 40%, rgba(255,255,255,.5) 50%, transparent 51%),
-                radial-gradient(ellipse 18px 12px at 30% 65%, rgba(255,255,255,.6) 50%, transparent 51%),
-                radial-gradient(ellipse 12px 6px at 75% 70%, rgba(255,255,255,.5) 50%, transparent 51%);
-            animation: rotate-clouds 25s linear infinite;
-        }
-        @keyframes rotate-earth { from { transform: rotate(0) } to { transform: rotate(360deg) } }
-        @keyframes rotate-clouds { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+  .duck {
+    position: absolute;
+    bottom: 35px;
+    left: 20px;
+    width: 90px;
+    height: 70px;
+    animation: bounce 0.5s ease-in-out infinite;
+  }
 
-        .orbit { position: absolute; top: 50%; left: 50%; width: 500px; height: 500px; border: 2px dashed rgba(255,255,255,.1); border-radius: 50%; transform: translate(-50%, -50%); }
-        .bird-orbit { position: absolute; top: 50%; left: 50%; width: 500px; height: 500px; transform: translate(-50%, -50%); animation: orbit 8s linear infinite; }
-        @keyframes orbit { from { transform: translate(-50%, -50%) rotate(0) } to { transform: translate(-50%, -50%) rotate(360deg) } }
+  .duck .head {
+    width: 50px;
+    height: 50px;
+    background-color: #FFD700;
+    border-radius: 50%;
+    position: absolute;
+    top: -20px;
+    left: 30px;
+    border: 2px solid #DAA520;
+  }
 
-        .bird { position: absolute; top: 0; left: 50%; width: 60px; height: 40px; transform: translateX(-50%) translateY(-20px); animation: bird-tilt 8s linear infinite; }
-        @keyframes bird-tilt {
-            0% { transform: translateX(-50%) translateY(-20px) rotate(0) }
-            25% { transform: translateX(-50%) translateY(-20px) rotate(-15deg) }
-            50% { transform: translateX(-50%) translateY(-20px) rotate(0) }
-            75% { transform: translateX(-50%) translateY(-20px) rotate(15deg) }
-            100% { transform: translateX(-50%) translateY(-20px) rotate(0) }
-        }
+  .duck .eye {
+    width: 8px;
+    height: 8px;
+    background-color: #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 15px;
+    left: 30px;
+  }
 
-        .bird-body { position: absolute; width: 35px; height: 22px; background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%); border-radius: 50%; top: 9px; left: 12px; z-index: 2; }
-        .bird-head { position: absolute; width: 20px; height: 20px; background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%); border-radius: 50%; top: 5px; left: 35px; z-index: 2; }
-        .bird-beak { position: absolute; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 12px solid #FFA500; top: 10px; left: 50px; z-index: 2; }
-        .bird-eye { position: absolute; width: 4px; height: 4px; background: white; border-radius: 50%; top: 9px; left: 42px; z-index: 3; }
-        .bird-tail { position: absolute; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 25px solid #4A4A4A; top: 10px; left: -5px; z-index: 1; }
-        .wing { position: absolute; background: linear-gradient(45deg, #2F2F2F 0%, #555 50%, #2F2F2F 100%); border-radius: 50% 10% 50% 10%; transform-origin: bottom center; z-index: 1; }
-        .wing-left { width: 28px; height: 38px; top: 2px; left: 8px; animation: flap-left .25s ease-in-out infinite; }
-        .wing-right { width: 28px; height: 38px; top: 2px; right: 8px; animation: flap-right .25s ease-in-out infinite; }
-        @keyframes flap-left { 0%,100% { transform: rotate(-50deg) scaleY(1) } 50% { transform: rotate(-25deg) scaleY(.7) } }
-        @keyframes flap-right { 0%,100% { transform: rotate(50deg) scaleY(1) } 50% { transform: rotate(25deg) scaleY(.7) } }
+  .duck .beak {
+    width: 30px;
+    height: 15px;
+    background-color: #FFA500;
+    border: 2px solid #E69500;
+    border-radius: 5px 20px 20px 5px;
+    position: absolute;
+    top: 20px;
+    left: 45px;
+  }
 
-        .title { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 26px; font-weight: 700; text-shadow: 2px 2px 6px rgba(0,0,0,.45); letter-spacing: 1px; }
-    </style>
+  .duck .body {
+    width: 80px;
+    height: 50px;
+    background-color: #FFD700;
+    border-radius: 50% 40% 40% 50% / 60% 60% 40% 40%;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    border: 2px solid #DAA520;
+  }
+
+  .duck .wing {
+    width: 40px;
+    height: 25px;
+    background-color: #FFC400;
+    border: 2px solid #DAA520;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform: rotate(-15deg);
+    position: absolute;
+    top: 10px;
+    left: 15px;
+  }
+
+  .scooter {
+    position: relative;
+    width: 120px;
+    height: 80px;
+  }
+
+  .scooter .deck {
+    width: 100px;
+    height: 10px;
+    background-color: #FF6347;
+    border: 2px solid #E5533D;
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+    border-radius: 5px;
+  }
+
+  .scooter .stem {
+    width: 8px;
+    height: 50px;
+    background-color: #708090;
+    border: 2px solid #637381;
+    position: absolute;
+    bottom: 25px;
+    left: 20px;
+    transform: rotate(15deg);
+  }
+
+  .scooter .handlebars {
+    width: 40px;
+    height: 8px;
+    background-color: #708090;
+    border: 2px solid #637381;
+    position: absolute;
+    bottom: 70px;
+    left: 0px;
+    border-radius: 5px;
+  }
+
+  .scooter .wheel {
+    width: 30px;
+    height: 30px;
+    background-color: #555;
+    border: 3px solid #333;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 0;
+    animation: rotate 0.5s linear infinite;
+  }
+
+  .scooter .wheel.front {
+    left: 90px;
+  }
+
+  .scooter .wheel.back {
+    left: 10px;
+  }
+
+  @keyframes moveAcross {
+    0% {
+      transform: translateX(-150px);
+    }
+    100% {
+      transform: translateX(320px);
+    }
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+</style>
 </head>
 <body>
-    <div class="stars"></div>
-    <div class="title">Bird Flying Around Earth</div>
 
-    <div class="earth-container">
-        <div class="earth"></div>
+<div class="container">
+  <div class="scooter-duck">
+    <div class="duck">
+      <div class="head">
+        <div class="eye"></div>
+        <div class="beak"></div>
+      </div>
+      <div class="body">
+        <div class="wing"></div>
+      </div>
     </div>
+    <div class="scooter">
+      <div class="deck"></div>
+      <div class="stem"></div>
+      <div class="handlebars"></div>
+      <div class="wheel front"></div>
+      <div class="wheel back"></div>
+    </div>
+  </div>
+</div>
 
-    <div class="orbit"></div>
-    <div class="bird-orbit">
-        <div class="bird">
-            <div class="wing wing-left"></div>
-            <div class="wing wing-right"></div>
-            <div class="bird-tail"></div>
-            <div class="bird-body"></div>
-            <div class="bird-head"></div>
-            <div class="bird-beak"></div>
-            <div class="bird-eye"></div>
-        </div>
-    </div>
 </body>
 </html>
-

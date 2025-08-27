@@ -3,434 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bird Flying Around Earth - Claude</title>
+    <title>Claude - Duck Scooter Adventure</title>
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            height: 100vh;
-            background: radial-gradient(ellipse at center, #1e3c72 0%, #2a5298 50%, #000428 100%);
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(180deg, #87CEEB 0%, #E6F3FF 50%, #98FB98 100%);
+            width: 320px;
+            height: 320px;
             position: relative;
+            font-family: Arial, sans-serif;
         }
 
-        /* Stars background */
-        .stars {
-            position: absolute;
+        .scene {
             width: 100%;
             height: 100%;
-            background: transparent;
-        }
-
-        .stars::before,
-        .stars::after {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 
-                20px 30px white,
-                40px 70px white,
-                90px 40px white,
-                130px 80px white,
-                160px 30px white,
-                200px 90px white,
-                240px 50px white,
-                280px 100px white,
-                320px 40px white,
-                360px 80px white,
-                400px 60px white,
-                440px 100px white,
-                480px 30px white,
-                520px 70px white,
-                560px 40px white,
-                600px 90px white,
-                640px 50px white,
-                680px 80px white,
-                720px 60px white,
-                760px 100px white,
-                800px 40px white,
-                840px 70px white,
-                880px 50px white,
-                920px 90px white,
-                960px 30px white,
-                1000px 80px white,
-                1040px 60px white,
-                1080px 100px white,
-                1120px 40px white,
-                1160px 70px white,
-                1200px 50px white,
-                50px 150px white,
-                100px 200px white,
-                150px 180px white,
-                200px 250px white,
-                250px 170px white,
-                300px 220px white,
-                350px 190px white,
-                400px 240px white,
-                450px 180px white,
-                500px 210px white,
-                550px 170px white,
-                600px 230px white,
-                650px 190px white,
-                700px 220px white,
-                750px 180px white,
-                800px 250px white,
-                850px 200px white,
-                900px 170px white,
-                950px 210px white,
-                1000px 180px white,
-                1050px 240px white,
-                1100px 200px white,
-                1150px 170px white,
-                1200px 220px white;
-            animation: twinkle 3s infinite linear alternate;
-        }
-
-        @keyframes twinkle {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-
-        /* Earth container */
-        .earth-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            overflow: hidden;
         }
 
-        /* Earth */
-        .earth {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: 
-                radial-gradient(circle at 30% 30%, #87CEEB 0%, transparent 50%),
-                linear-gradient(45deg, #228B22 0%, #32CD32 25%, #4169E1 25%, #4169E1 50%, #228B22 50%, #228B22 75%, #4169E1 75%, #4169E1 100%);
-            background-size: 100% 100%, 60px 60px;
-            position: relative;
-            box-shadow: 
-                inset -30px -30px 50px rgba(0,0,0,0.4),
-                0 0 50px rgba(65, 105, 225, 0.3);
-            animation: rotate-earth 20s infinite linear;
-        }
-
-        /* Continents */
-        .earth::before {
-            content: '';
+        /* Sun in background */
+        .sun {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-image: 
-                radial-gradient(ellipse 40px 30px at 25% 30%, #228B22 40%, transparent 41%),
-                radial-gradient(ellipse 50px 35px at 70% 25%, #32CD32 40%, transparent 41%),
-                radial-gradient(ellipse 35px 25px at 60% 60%, #228B22 40%, transparent 41%),
-                radial-gradient(ellipse 45px 40px at 20% 70%, #32CD32 40%, transparent 41%),
-                radial-gradient(ellipse 30px 20px at 80% 75%, #228B22 40%, transparent 41%);
-        }
-
-        /* Clouds on Earth */
-        .earth::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-image: 
-                radial-gradient(ellipse 20px 10px at 40% 20%, rgba(255,255,255,0.6) 50%, transparent 51%),
-                radial-gradient(ellipse 15px 8px at 65% 40%, rgba(255,255,255,0.5) 50%, transparent 51%),
-                radial-gradient(ellipse 18px 12px at 30% 65%, rgba(255,255,255,0.6) 50%, transparent 51%),
-                radial-gradient(ellipse 12px 6px at 75% 70%, rgba(255,255,255,0.5) 50%, transparent 51%);
-            animation: rotate-clouds 25s infinite linear;
-        }
-
-        @keyframes rotate-earth {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes rotate-clouds {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Orbit path */
-        .orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 500px;
-            height: 500px;
-            border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            animation: pulse-orbit 4s infinite ease-in-out;
-        }
-
-        @keyframes pulse-orbit {
-            0%, 100% { opacity: 0.1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Bird orbital motion */
-        .bird-orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 500px;
-            height: 500px;
-            transform: translate(-50%, -50%);
-            animation: orbit 8s infinite linear;
-        }
-
-        @keyframes orbit {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* Bird container */
-        .bird {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 60px;
+            top: 20px;
+            right: 30px;
+            width: 40px;
             height: 40px;
-            transform: translateX(-50%) translateY(-20px);
-            animation: bird-tilt 8s infinite linear;
-        }
-
-        @keyframes bird-tilt {
-            0% { transform: translateX(-50%) translateY(-20px) rotate(0deg); }
-            25% { transform: translateX(-50%) translateY(-20px) rotate(-15deg); }
-            50% { transform: translateX(-50%) translateY(-20px) rotate(0deg); }
-            75% { transform: translateX(-50%) translateY(-20px) rotate(15deg); }
-            100% { transform: translateX(-50%) translateY(-20px) rotate(0deg); }
-        }
-
-        /* Bird Body */
-        .bird-body {
-            position: absolute;
-            width: 35px;
-            height: 22px;
-            background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%);
-            border-radius: 50% 50% 50% 50%;
-            top: 9px;
-            left: 12px;
-            z-index: 2;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        /* Bird Head */
-        .bird-head {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(45deg, #4A4A4A 0%, #666 50%, #4A4A4A 100%);
+            background: radial-gradient(circle, #FFD700 0%, #FFA500 70%);
             border-radius: 50%;
-            top: 5px;
-            left: 35px;
-            z-index: 2;
+            animation: sun-glow 3s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .sun::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: sun-rays 4s linear infinite;
+        }
+
+        /* Duck and scooter container */
+        .duck-scooter-combo {
+            position: absolute;
+            bottom: 80px;
+            left: -150px;
+            animation: journey 12s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+
+        /* Scooter components */
+        .scooter {
+            position: relative;
+            width: 100px;
+            height: 60px;
+        }
+
+        .scooter-deck {
+            position: absolute;
+            width: 70px;
+            height: 8px;
+            background: linear-gradient(45deg, #4169E1, #1E90FF);
+            border-radius: 4px;
+            bottom: 25px;
+            left: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Bird Beak */
-        .bird-beak {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            border-left: 12px solid #FFA500;
-            top: 10px;
-            left: 50px;
-            z-index: 2;
-            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
-        }
-
-        /* Bird Eye */
-        .bird-eye {
+        .scooter-post {
             position: absolute;
             width: 4px;
-            height: 4px;
-            background: white;
-            border-radius: 50%;
-            top: 9px;
-            left: 42px;
-            z-index: 3;
+            height: 35px;
+            background: linear-gradient(180deg, #333, #666);
+            bottom: 33px;
+            left: 15px;
+            border-radius: 2px;
         }
 
-        .bird-eye::after {
+        .handlebars {
+            position: absolute;
+            width: 35px;
+            height: 3px;
+            background: #333;
+            bottom: 45px;
+            left: 8px;
+            border-radius: 2px;
+            animation: handlebar-wiggle 0.8s ease-in-out infinite;
+        }
+
+        .handlebar-grips {
+            position: absolute;
+            width: 6px;
+            height: 8px;
+            background: #8B4513;
+            border-radius: 3px;
+            top: -2px;
+            left: -3px;
+        }
+
+        .handlebar-grips::after {
             content: '';
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: black;
+            width: 6px;
+            height: 8px;
+            background: #8B4513;
+            border-radius: 3px;
+            left: 41px;
+        }
+
+        /* Wheels with enhanced rotation */
+        .front-wheel, .back-wheel {
+            position: absolute;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
-            top: 1px;
+            background: radial-gradient(circle, #333 30%, #666 70%);
+            border: 2px solid #444;
+            bottom: 0;
+            animation: wheel-spin 0.3s linear infinite;
+        }
+
+        .front-wheel {
+            left: 10px;
+        }
+
+        .back-wheel {
+            right: 15px;
+        }
+
+        /* Wheel spokes */
+        .wheel-spoke {
+            position: absolute;
+            width: 1px;
+            height: 7px;
+            background: #AAA;
+            top: 5px;
+            left: 8px;
+            border-radius: 0.5px;
+        }
+
+        .wheel-spoke:nth-child(2) { transform: rotate(60deg); }
+        .wheel-spoke:nth-child(3) { transform: rotate(120deg); }
+
+        /* Duck character */
+        .duck {
+            position: absolute;
+            top: -55px;
+            left: 25px;
+            width: 50px;
+            height: 45px;
+            animation: duck-ride-bounce 0.4s ease-in-out infinite alternate;
+        }
+
+        .duck-body {
+            position: absolute;
+            width: 35px;
+            height: 30px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+            border-radius: 60% 60% 50% 50% / 70% 70% 30% 30%;
+            top: 8px;
+            left: 8px;
+            box-shadow: 
+                inset 0 2px 4px rgba(255,255,255,0.3),
+                0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .duck-head {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 70%);
+            border-radius: 50%;
+            top: -2px;
+            left: 14px;
+            box-shadow: 
+                inset 0 1px 3px rgba(255,255,255,0.4),
+                0 2px 4px rgba(0,0,0,0.2);
+            animation: head-bob 0.6s ease-in-out infinite;
+        }
+
+        .duck-beak {
+            position: absolute;
+            width: 10px;
+            height: 6px;
+            background: linear-gradient(45deg, #FF8C00, #FF6347);
+            border-radius: 0 60% 60% 30%;
+            top: 8px;
+            left: 0px;
+            transform: rotate(10deg);
+            animation: beak-movement 1.2s ease-in-out infinite;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .duck-eye {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #000;
+            border-radius: 50%;
+            top: 6px;
+            left: 6px;
+            animation: eye-blink 3s ease-in-out infinite;
+        }
+
+        .duck-eye::before {
+            content: '';
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            background: #FFF;
+            border-radius: 50%;
+            top: 0px;
             left: 1px;
         }
 
-        /* Bird Tail */
-        .bird-tail {
+        .duck-wing {
             position: absolute;
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            border-right: 25px solid #4A4A4A;
-            top: 10px;
-            left: -5px;
-            z-index: 1;
-            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+            width: 18px;
+            height: 12px;
+            background: linear-gradient(45deg, #FFD700 0%, #FFA500 70%);
+            border-radius: 40% 80% 60% 40%;
+            top: 12px;
+            left: 2px;
+            transform: rotate(-15deg);
+            animation: wing-flutter 0.5s ease-in-out infinite alternate;
+            box-shadow: 
+                inset 0 1px 2px rgba(255,255,255,0.3),
+                0 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* Wings */
-        .wing {
+        .duck-tail {
             position: absolute;
-            background: linear-gradient(45deg, #2F2F2F 0%, #555 50%, #2F2F2F 100%);
-            border-radius: 50% 10% 50% 10%;
-            transform-origin: bottom center;
-            z-index: 1;
-            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+            width: 12px;
+            height: 8px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border-radius: 50% 70% 40% 80%;
+            top: 25px;
+            left: 35px;
+            transform: rotate(25deg);
+            animation: tail-wiggle 0.8s ease-in-out infinite alternate;
         }
 
-        .wing-left {
-            width: 28px;
-            height: 38px;
-            top: 2px;
-            left: 8px;
-            animation: flap-left 0.25s infinite ease-in-out;
-        }
-
-        .wing-right {
-            width: 28px;
-            height: 38px;
-            top: 2px;
-            right: 8px;
-            animation: flap-right 0.25s infinite ease-in-out;
-        }
-
-        @keyframes flap-left {
-            0%, 100% {
-                transform: rotate(-50deg) scaleY(1);
-            }
-            50% {
-                transform: rotate(-25deg) scaleY(0.7);
-            }
-        }
-
-        @keyframes flap-right {
-            0%, 100% {
-                transform: rotate(50deg) scaleY(1);
-            }
-            50% {
-                transform: rotate(25deg) scaleY(0.7);
-            }
-        }
-
-        /* Title */
-        .title {
+        /* Environment */
+        .ground {
             position: absolute;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-family: 'Arial', sans-serif;
-            font-size: 28px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            letter-spacing: 2px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(0deg, #228B22 0%, #32CD32 30%, #90EE90 100%);
+            border-top: 3px solid #006400;
         }
 
-        /* Glowing effect around Earth */
-        .earth-glow {
+        /* Grass blades */
+        .grass {
             position: absolute;
-            width: 320px;
-            height: 320px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: radial-gradient(circle, rgba(65, 105, 225, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: glow-pulse 3s infinite ease-in-out;
+            bottom: 80px;
+            width: 100%;
+            height: 15px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 2px,
+                #228B22 2px,
+                #228B22 3px
+            );
+            opacity: 0.6;
         }
 
-        @keyframes glow-pulse {
-            0%, 100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-                opacity: 0.6;
-            }
-        }
-
-        /* Distance indicators */
-        .distance-marker {
+        /* Clouds with parallax effect */
+        .cloud {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 4px;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
+            background: #FFF;
+            border-radius: 50px;
+            opacity: 0.8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .marker1 {
-            width: 400px;
-            height: 400px;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 50%;
-            background: transparent;
+        .cloud:nth-child(1) {
+            width: 50px;
+            height: 20px;
+            top: 25px;
+            left: 80px;
+            animation: cloud-drift-slow 25s linear infinite;
         }
 
-        .marker2 {
-            width: 600px;
-            height: 600px;
-            border: 1px solid rgba(255,255,255,0.03);
-            border-radius: 50%;
-            background: transparent;
+        .cloud:nth-child(2) {
+            width: 35px;
+            height: 15px;
+            top: 50px;
+            left: 180px;
+            animation: cloud-drift-medium 20s linear infinite reverse;
+        }
+
+        .cloud:nth-child(3) {
+            width: 40px;
+            height: 18px;
+            top: 35px;
+            left: 250px;
+            animation: cloud-drift-fast 15s linear infinite;
+        }
+
+        /* Speed lines for motion effect */
+        .speed-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .speed-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+            animation: speed-line-move 1s linear infinite;
+        }
+
+        .speed-line:nth-child(1) {
+            top: 120px;
+            width: 30px;
+            animation-delay: 0s;
+        }
+
+        .speed-line:nth-child(2) {
+            top: 140px;
+            width: 25px;
+            animation-delay: 0.3s;
+        }
+
+        .speed-line:nth-child(3) {
+            top: 160px;
+            width: 35px;
+            animation-delay: 0.6s;
+        }
+
+        /* Animation keyframes */
+        @keyframes journey {
+            0% { 
+                left: -150px; 
+                transform: scale(1) rotate(0deg);
+            }
+            25% { 
+                left: 85px; 
+                transform: scale(1.05) rotate(1deg);
+            }
+            50% { 
+                left: 220px; 
+                transform: scale(1) rotate(0deg);
+            }
+            75% { 
+                left: 350px; 
+                transform: scale(0.95) rotate(-1deg);
+            }
+            100% { 
+                left: 450px; 
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes wheel-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes duck-ride-bounce {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-4px) rotate(1deg); }
+        }
+
+        @keyframes wing-flutter {
+            0% { 
+                transform: rotate(-15deg) scaleX(1) scaleY(1); 
+            }
+            100% { 
+                transform: rotate(-5deg) scaleX(0.9) scaleY(0.95); 
+            }
+        }
+
+        @keyframes head-bob {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-1px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes beak-movement {
+            0% { transform: rotate(10deg) scaleY(1); }
+            50% { transform: rotate(5deg) scaleY(0.9); }
+            100% { transform: rotate(10deg) scaleY(1); }
+        }
+
+        @keyframes eye-blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        @keyframes tail-wiggle {
+            0% { transform: rotate(25deg); }
+            100% { transform: rotate(35deg); }
+        }
+
+        @keyframes handlebar-wiggle {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes sun-glow {
+            0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+            100% { box-shadow: 0 0 35px rgba(255, 215, 0, 0.9); }
+        }
+
+        @keyframes sun-rays {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes cloud-drift-slow {
+            0% { transform: translateX(0px); }
+            100% { transform: translateX(400px); }
+        }
+
+        @keyframes cloud-drift-medium {
+            0% { transform: translateX(0px); }
+            100% { transform: translateX(350px); }
+        }
+
+        @keyframes cloud-drift-fast {
+            0% { transform: translateX(0px); }
+            100% { transform: translateX(380px); }
+        }
+
+        @keyframes speed-line-move {
+            0% { 
+                left: 100%;
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% { 
+                left: -100px;
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-    
-    <div class="title">Bird Flying Around Earth</div>
-    
-    <div class="distance-marker marker2"></div>
-    <div class="distance-marker marker1"></div>
-    
-    <div class="earth-glow"></div>
-    
-    <div class="orbit"></div>
-    
-    <div class="earth-container">
-        <div class="earth"></div>
-    </div>
-    
-    <div class="bird-orbit">
-        <div class="bird">
-            <div class="wing wing-left"></div>
-            <div class="wing wing-right"></div>
-            <div class="bird-tail"></div>
-            <div class="bird-body"></div>
-            <div class="bird-head"></div>
-            <div class="bird-beak"></div>
-            <div class="bird-eye"></div>
+    <div class="scene">
+        <!-- Background elements -->
+        <div class="sun"></div>
+        
+        <!-- Clouds -->
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+
+        <!-- Speed lines for motion effect -->
+        <div class="speed-lines">
+            <div class="speed-line"></div>
+            <div class="speed-line"></div>
+            <div class="speed-line"></div>
         </div>
+
+        <!-- Main duck and scooter -->
+        <div class="duck-scooter-combo">
+            <div class="scooter">
+                <div class="scooter-deck"></div>
+                <div class="scooter-post"></div>
+                <div class="handlebars">
+                    <div class="handlebar-grips"></div>
+                </div>
+                
+                <div class="front-wheel">
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                </div>
+                
+                <div class="back-wheel">
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                    <div class="wheel-spoke"></div>
+                </div>
+            </div>
+
+            <div class="duck">
+                <div class="duck-body"></div>
+                <div class="duck-head">
+                    <div class="duck-beak"></div>
+                    <div class="duck-eye"></div>
+                </div>
+                <div class="duck-wing"></div>
+                <div class="duck-tail"></div>
+            </div>
+        </div>
+
+        <!-- Ground and environment -->
+        <div class="grass"></div>
+        <div class="ground"></div>
     </div>
 </body>
 </html>

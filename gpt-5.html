@@ -1,367 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPT-5 — Majestic Bird Orbiting Earth</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(1200px 700px at 50% 40%, #0a0f2c 0%, #050818 55%, #02040c 100%);
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            color: #eef5ff;
-        }
-
-        .stars {
-            position: fixed;
-            inset: 0;
-            background-image:
-                radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.8) 50%, transparent 51%),
-                radial-gradient(1px 1px at 30% 70%, rgba(255,255,255,0.7) 50%, transparent 51%),
-                radial-gradient(1.5px 1.5px at 60% 35%, rgba(255,255,255,0.9) 50%, transparent 51%),
-                radial-gradient(1px 1px at 80% 60%, rgba(255,255,255,0.6) 50%, transparent 51%),
-                radial-gradient(2px 2px at 50% 85%, rgba(255,255,255,0.75) 50%, transparent 51%);
-            background-repeat: repeat;
-            background-size: 400px 300px;
-            animation: twinkle 4s ease-in-out infinite alternate;
-            opacity: 0.85;
-        }
-
-        .scene {
-            position: relative;
-            width: 640px;
-            height: 640px;
-            perspective: 1200px;
-        }
-
-        .title {
-            position: absolute;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            letter-spacing: 1.5px;
-            font-weight: 700;
-            font-size: 28px;
-            text-shadow: 0 0 24px rgba(160,200,255,0.55), 1px 2px 0 rgba(0,0,0,0.35);
-            z-index: 10;
-        }
-
-        .orbital-plane {
-            position: absolute;
-            inset: 0;
-            transform: rotateX(22deg) rotateZ(0deg);
-            transform-style: preserve-3d;
-        }
-
-        .orbit-trail {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 520px;
-            height: 520px;
-            margin: -260px 0 0 -260px;
-            border-radius: 50%;
-            border: 2px dashed rgba(173,216,230,0.25);
-            box-shadow: 0 0 40px rgba(90,160,255,0.15) inset;
-            animation: pulseTrail 3.2s ease-in-out infinite;
-        }
-
-        /* Earth */
-        .earth {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300px;
-            height: 300px;
-            margin: -150px 0 0 -150px;
-            border-radius: 50%;
-            background:
-                radial-gradient(140px 140px at 70% 35%, rgba(255,255,255,0.12) 0%, transparent 70%),
-                radial-gradient(120px 120px at 30% 65%, rgba(0,0,0,0.35) 0%, transparent 70%),
-                radial-gradient(circle at 50% 50%, #1a7bd1 0%, #1562a7 40%, #0f4a82 70%, #0a345e 100%);
-            box-shadow:
-                inset -28px -28px 40px rgba(0,0,0,0.45),
-                inset 10px 10px 20px rgba(255,255,255,0.12),
-                0 0 60px rgba(30,120,255,0.30);
-            overflow: hidden;
-            z-index: 2;
-        }
-
-        .earth .land {
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at 28% 38%, #2e8b57 0%, #2e8b57 18%, transparent 22%),
-                radial-gradient(ellipse at 36% 46%, #3aa76d 0%, #3aa76d 14%, transparent 18%),
-                radial-gradient(ellipse at 62% 30%, #2e8b57 0%, #2e8b57 16%, transparent 20%),
-                radial-gradient(ellipse at 70% 66%, #3aa76d 0%, #3aa76d 15%, transparent 19%),
-                radial-gradient(ellipse at 48% 70%, #2e8b57 0%, #2e8b57 22%, transparent 26%),
-                radial-gradient(ellipse at 74% 80%, #2e8b57 0%, #2e8b57 10%, transparent 14%);
-            mix-blend-mode: normal;
-            opacity: 0.85;
-            animation: drift 40s linear infinite;
-        }
-
-        .earth .clouds {
-            position: absolute;
-            inset: -6%;
-            background:
-                radial-gradient(ellipse at 30% 45%, rgba(255,255,255,0.32) 0%, transparent 35%),
-                radial-gradient(ellipse at 60% 35%, rgba(255,255,255,0.22) 0%, transparent 30%),
-                radial-gradient(ellipse at 70% 70%, rgba(255,255,255,0.26) 0%, transparent 38%),
-                radial-gradient(ellipse at 45% 80%, rgba(255,255,255,0.18) 0%, transparent 28%);
-            border-radius: 50%;
-            filter: blur(1px);
-            opacity: 0.9;
-            animation: rotateAtmosphere 28s linear infinite reverse;
-            pointer-events: none;
-        }
-
-        .earth .glow {
-            position: absolute;
-            inset: -8%;
-            border-radius: 50%;
-            background: radial-gradient(closest-side, rgba(120,200,255,0.22), rgba(120,200,255,0.06) 55%, transparent 70%);
-            animation: glowRotate 40s linear infinite;
-            pointer-events: none;
-        }
-
-        /* Orbiting Bird */
-        .orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 520px;
-            height: 520px;
-            margin: -260px 0 0 -260px;
-            transform-origin: 50% 50%;
-            animation: orbit 18s linear infinite;
-            z-index: 3;
-        }
-
-        .bird {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 160px;
-            height: 120px;
-            transform: rotate(0deg) translateX(240px) rotate(0deg);
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.35)) drop-shadow(0 8px 16px rgba(0,0,0,0.45));
-        }
-
-        .bird .body {
-            position: absolute;
-            top: 32px;
-            left: 30px;
-            width: 82px;
-            height: 54px;
-            background: linear-gradient(135deg, #7c3aed 0%, #5b8dff 50%, #22d3ee 100%);
-            border-radius: 58% 42% 48% 52% / 60% 40% 60% 40%;
-            transform: rotate(18deg);
-            box-shadow: inset -10px -10px 18px rgba(0,0,0,0.25), inset 6px 6px 12px rgba(255,255,255,0.18);
-        }
-
-        .bird .breast {
-            position: absolute;
-            top: 55px;
-            left: 58px;
-            width: 46px;
-            height: 34px;
-            background: radial-gradient(ellipse at 40% 40%, #ffd59e 0%, #ffb86b 45%, transparent 60%);
-            border-radius: 50%;
-            transform: rotate(16deg);
-            opacity: 0.85;
-        }
-
-        .bird .head {
-            position: absolute;
-            top: 20px;
-            left: 90px;
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 65%);
-            border-radius: 50%;
-            box-shadow: inset -6px -6px 10px rgba(0,0,0,0.25);
-        }
-
-        .bird .eye {
-            position: absolute;
-            top: 12px;
-            left: 18px;
-            width: 9px;
-            height: 9px;
-            background: radial-gradient(circle at 40% 40%, #000 0%, #222 55%, #555 100%);
-            border-radius: 50%;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.2) inset;
-        }
-
-        .bird .beak {
-            position: absolute;
-            top: 14px;
-            left: 126px;
-            width: 0;
-            height: 0;
-            border-left: 26px solid #ff6b6b;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.25));
-        }
-
-        .bird .tail {
-            position: absolute;
-            top: 60px;
-            left: 14px;
-            width: 0;
-            height: 0;
-            border-right: 36px solid #4c1d95;
-            border-top: 14px solid transparent;
-            border-bottom: 14px solid transparent;
-            transform: rotate(-16deg);
-            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.25));
-        }
-
-        .wing {
-            position: absolute;
-            top: 18px;
-            left: 14px;
-            width: 54px;
-            height: 72px;
-            border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
-            background: linear-gradient(145deg, #4c1d95 0%, #6d28d9 40%, #7c3aed 60%, #22d3ee 100%);
-            transform-origin: 90% 20%;
-            animation: flap 0.48s ease-in-out infinite alternate;
-            box-shadow: inset -10px -10px 16px rgba(0,0,0,0.25), inset 8px 8px 14px rgba(255,255,255,0.14);
-        }
-
-        .wing.right {
-            left: 54px;
-            transform-origin: 10% 20%;
-            animation-delay: 0.24s;
-        }
-
-        .flight-sheen {
-            position: absolute;
-            top: 28px;
-            left: 46px;
-            width: 42px;
-            height: 18px;
-            border-radius: 50%;
-            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.32) 45%, transparent 90%);
-            transform: rotate(18deg);
-            pointer-events: none;
-        }
-
-        /* Keep the bird oriented forward during orbit */
-        .orbit { /* rotation handled here */ }
-        .bird { animation: faceForward 18s linear infinite; }
-
-        @keyframes orbit {
-            0%   { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes faceForward {
-            0%   { transform: rotate(0deg) translateX(240px) rotate(0deg) scale(1); }
-            25%  { transform: rotate(90deg) translateX(240px) rotate(-90deg) scale(1.06); }
-            50%  { transform: rotate(180deg) translateX(240px) rotate(-180deg) scale(1); }
-            75%  { transform: rotate(270deg) translateX(240px) rotate(-270deg) scale(0.94); }
-            100% { transform: rotate(360deg) translateX(240px) rotate(-360deg) scale(1); }
-        }
-
-        @keyframes flap {
-            0%   { transform: rotate(-26deg) scaleY(1.0) scaleX(1.02); }
-            100% { transform: rotate(52deg)  scaleY(0.70) scaleX(0.96); }
-        }
-
-        @keyframes rotateAtmosphere {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
-        }
-
-        @keyframes glowRotate {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(-360deg); }
-        }
-
-        @keyframes drift {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
-        }
-
-        @keyframes twinkle {
-            0%   { opacity: 0.65; }
-            100% { opacity: 0.95; }
-        }
-
-        @keyframes pulseTrail {
-            0%, 100% {
-                opacity: 0.30;
-                box-shadow: 0 0 40px rgba(90,160,255,0.15) inset;
-            }
-            50% {
-                opacity: 0.55;
-                box-shadow: 0 0 52px rgba(90,160,255,0.28) inset;
-            }
-        }
-
-        .footer {
-            position: absolute;
-            bottom: 26px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 14px;
-            letter-spacing: 0.4px;
-            color: rgba(230,240,255,0.85);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.55);
-        }
-    </style>
-    <!-- Pure HTML/CSS only; no images or JS used. -->
-    <!-- Inspired by celestial themes; handcrafted vector-like shapes with gradients. -->
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Duck on a Scooter</title>
+	<style>
+		/* Page resets */
+		html, body { margin: 0; padding: 0; background: #0e0f15; }
+		body { display: grid; place-items: center; height: 100vh; }
+		/* Prevent blurriness on some displays */
+		svg { shape-rendering: geometricPrecision; text-rendering: geometricPrecision; }
+	</style>
 </head>
 <body>
-    <div class="stars"></div>
+	<!-- Fixed 320x320 scene inside the SVG so it always fits in a 320px iframe -->
+	<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Looping animation of a cartoon duck riding a scooter">
+		<!-- Background sky gradient -->
+		<defs>
+			<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+				<stop offset="0%" stop-color="#8ec5ff" />
+				<stop offset="100%" stop-color="#d9f2ff" />
+			</linearGradient>
+			<linearGradient id="road" x1="0" y1="0" x2="1" y2="0">
+				<stop offset="0%" stop-color="#272a33" />
+				<stop offset="100%" stop-color="#20232b" />
+			</linearGradient>
+			<linearGradient id="duckBodyGrad" x1="0" y1="0" x2="0" y2="1">
+				<stop offset="0%" stop-color="#fff3a1" />
+				<stop offset="100%" stop-color="#ffe06a" />
+			</linearGradient>
+			<linearGradient id="beakGrad" x1="0" y1="0" x2="1" y2="1">
+				<stop offset="0%" stop-color="#ff9f2e" />
+				<stop offset="100%" stop-color="#ff7b00" />
+			</linearGradient>
+		</defs>
 
-    <div class="scene">
-        <div class="title">GPT-5</div>
+		<!-- Sky -->
+		<rect x="0" y="0" width="320" height="320" fill="url(#sky)" />
 
-        <div class="orbital-plane">
-            <div class="orbit-trail"></div>
+		<!-- Simple moving clouds for parallax feel -->
+		<g opacity="0.5">
+			<g>
+				<g>
+					<ellipse cx="40" cy="60" rx="18" ry="12" fill="#ffffff" />
+					<ellipse cx="56" cy="60" rx="14" ry="10" fill="#ffffff" />
+					<ellipse cx="28" cy="60" rx="10" ry="8" fill="#ffffff" />
+				</g>
+				<animateTransform attributeName="transform" attributeType="XML" type="translate" from="-360 0" to="360 0" begin="0s" dur="24s" repeatCount="indefinite" />
+			</g>
+			<g>
+				<g>
+					<ellipse cx="260" cy="90" rx="20" ry="12" fill="#ffffff" />
+					<ellipse cx="276" cy="90" rx="14" ry="10" fill="#ffffff" />
+					<ellipse cx="244" cy="90" rx="10" ry="8" fill="#ffffff" />
+				</g>
+				<animateTransform attributeName="transform" attributeType="XML" type="translate" from="360 0" to="-360 0" begin="-6s" dur="28s" repeatCount="indefinite" />
+			</g>
+		</g>
 
-            <div class="earth">
-                <div class="land"></div>
-                <div class="clouds"></div>
-                <div class="glow"></div>
-            </div>
+		<!-- Ground / road -->
+		<rect x="0" y="250" width="320" height="70" fill="url(#road)" />
+		<!-- Lane dash -->
+		<g stroke="#aab2c5" stroke-width="4" stroke-linecap="round" opacity="0.6">
+			<line x1="20" y1="285" x2="60" y2="285" />
+			<line x1="90" y1="285" x2="130" y2="285" />
+			<line x1="160" y1="285" x2="200" y2="285" />
+			<line x1="230" y1="285" x2="270" y2="285" />
+		</g>
 
-            <div class="orbit">
-                <div class="bird">
-                    <div class="tail"></div>
-                    <div class="wing left wing-left wing"></div>
-                    <div class="wing right wing-right wing"></div>
-                    <div class="body"></div>
-                    <div class="breast"></div>
-                    <div class="head">
-                        <div class="eye"></div>
-                    </div>
-                    <div class="beak"></div>
-                    <div class="flight-sheen"></div>
-                </div>
-            </div>
-        </div>
+		<!-- Duck on Scooter (moves left -> right, loops) -->
+		<g id="duckScooter" transform="translate(-200,0)">
+			<animateTransform attributeName="transform" attributeType="XML" type="translate" from="-200 0" to="360 0" dur="7s" begin="0s" repeatCount="indefinite" />
 
-        <div class="footer">Big, beautiful bird soaring around a living Earth — pure CSS</div>
-    </div>
+			<!-- Drop shadow under scooter -->
+			<ellipse cx="60" cy="270" rx="55" ry="10" fill="#000" opacity="0.2" />
+
+			<!-- SCOOTER -->
+			<!-- Wheels -->
+			<g transform="translate(20,260)">
+				<circle r="18" fill="#2c2f3a" stroke="#12131a" stroke-width="3" />
+				<circle r="12" fill="#3a3f4d" />
+				<g>
+					<line x1="0" y1="-12" x2="0" y2="12" stroke="#dfe5f7" stroke-width="2" />
+					<line x1="-12" y1="0" x2="12" y2="0" stroke="#dfe5f7" stroke-width="2" />
+					<line x1="-8.5" y1="-8.5" x2="8.5" y2="8.5" stroke="#dfe5f7" stroke-width="1.5" />
+					<line x1="8.5" y1="-8.5" x2="-8.5" y2="8.5" stroke="#dfe5f7" stroke-width="1.5" />
+					<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="1.2s" repeatCount="indefinite" />
+				</g>
+			</g>
+			<g transform="translate(100,260)">
+				<circle r="18" fill="#2c2f3a" stroke="#12131a" stroke-width="3" />
+				<circle r="12" fill="#3a3f4d" />
+				<g>
+					<line x1="0" y1="-12" x2="0" y2="12" stroke="#dfe5f7" stroke-width="2" />
+					<line x1="-12" y1="0" x2="12" y2="0" stroke="#dfe5f7" stroke-width="2" />
+					<line x1="-8.5" y1="-8.5" x2="8.5" y2="8.5" stroke="#dfe5f7" stroke-width="1.5" />
+					<line x1="8.5" y1="-8.5" x2="-8.5" y2="8.5" stroke="#dfe5f7" stroke-width="1.5" />
+					<animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="1.2s" repeatCount="indefinite" />
+				</g>
+			</g>
+
+			<!-- Deck -->
+			<rect x="10" y="242" rx="8" ry="8" width="110" height="12" fill="#4e556a" stroke="#1b1f2a" stroke-width="3" />
+			<!-- Fork / Stem -->
+			<path d="M100 242 L100 186" stroke="#1b1f2a" stroke-width="6" stroke-linecap="round" />
+			<!-- Handlebar -->
+			<path d="M100 186 L136 186" stroke="#1b1f2a" stroke-width="6" stroke-linecap="round" />
+			<!-- Grips -->
+			<circle cx="136" cy="186" r="5" fill="#ff6f6f" />
+			<circle cx="100" cy="186" r="4" fill="#ff6f6f" />
+
+			<!-- DUCK -->
+			<!-- Tail feather -->
+			<path d="M28 215 q-10 -10 -8 -20 q10 6 16 4" fill="#ffe987" stroke="#e4c44f" stroke-width="2" stroke-linejoin="round" />
+
+			<!-- Body -->
+			<ellipse cx="58" cy="212" rx="42" ry="28" fill="url(#duckBodyGrad)" stroke="#e4c44f" stroke-width="3" />
+
+			<!-- Wing (flaps slightly) -->
+			<g transform="translate(48,208)">
+				<path d="M0 0 q-8 10 -4 20 q12 8 26 0 q-6 -10 -22 -20" fill="#ffe987" stroke="#e4c44f" stroke-width="2" />
+				<animateTransform attributeName="transform" type="rotate" values="0;8;0;-8;0" dur="1.8s" repeatCount="indefinite" />
+			</g>
+
+			<!-- Head -->
+			<g>
+				<circle cx="82" cy="192" r="16" fill="#fff4a8" stroke="#e4c44f" stroke-width="3" />
+				<!-- Eye -->
+				<circle cx="86" cy="190" r="3.2" fill="#1a1a1a" />
+				<circle cx="87.5" cy="188.8" r="1.2" fill="#ffffff" opacity="0.9" />
+				<!-- Beak -->
+				<path d="M94 194 q14 -2 20 4 q-8 8 -22 6" fill="url(#beakGrad)" stroke="#cc6b00" stroke-width="2" />
+			</g>
+
+			<!-- Neck / Connection -->
+			<path d="M70 202 q10 -6 18 -4" fill="none" stroke="#e4c44f" stroke-width="3" stroke-linecap="round" />
+
+			<!-- Feet on deck -->
+			<g>
+				<rect x="40" y="238" width="14" height="6" rx="2" fill="#ffb347" stroke="#cc6b00" stroke-width="2" />
+				<rect x="58" y="238" width="16" height="6" rx="2" fill="#ffb347" stroke="#cc6b00" stroke-width="2" />
+			</g>
+
+			<!-- Subtle rider bounce for life -->
+			<animateTransform attributeName="transform" type="translate" values="-200 0; -200 -2; -200 0; -200 2; -200 0" dur="1.2s" repeatCount="indefinite" additive="sum" />
+		</g>
+	</svg>
 </body>
 </html>
-
-
